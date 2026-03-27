@@ -172,7 +172,12 @@ function BiomarkerRing() {
   ];
 
   // Callout lines + labels from arc-end dots
-  const callouts = [
+  const callouts: Array<{
+    dot: { cx: number; cy: number };
+    lx: number; ly: number;
+    label: string; val: string;
+    anchor: "end" | "start" | "middle";
+  }> = [
     { dot: { cx: 58,  cy: 133 }, lx: 34,  ly: 112, label: "HRV", val: "82", anchor: "end"   },
     { dot: { cx: 135, cy: 97  }, lx: 118, ly: 76,  label: "TSTR", val: "91", anchor: "end"  },
     { dot: { cx: 119, cy: 232 }, lx: 95,  ly: 252, label: "VO2", val: "69", anchor: "end"   },
