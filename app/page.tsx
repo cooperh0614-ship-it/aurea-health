@@ -135,6 +135,7 @@ const HERO_STATS = [
 
 function BiomarkerRing() {
   const C = 200; // center
+  const r4 = (n: number) => Math.round(n * 10000) / 10000;
 
   // 60 tick marks, every 6°, starting from top (-90°)
   const ticks = Array.from({ length: 60 }, (_, i) => {
@@ -143,10 +144,10 @@ function BiomarkerRing() {
     const outerR = 186;
     const innerR = isMajor ? 177 : 182;
     return {
-      x1: C + outerR * Math.cos(angleRad),
-      y1: C + outerR * Math.sin(angleRad),
-      x2: C + innerR * Math.cos(angleRad),
-      y2: C + innerR * Math.sin(angleRad),
+      x1: r4(C + outerR * Math.cos(angleRad)),
+      y1: r4(C + outerR * Math.sin(angleRad)),
+      x2: r4(C + innerR * Math.cos(angleRad)),
+      y2: r4(C + innerR * Math.sin(angleRad)),
       isMajor,
     };
   });
@@ -210,8 +211,8 @@ function BiomarkerRing() {
         return (
           <line
             key={deg}
-            x1={C + 30 * Math.cos(rad)} y1={C + 30 * Math.sin(rad)}
-            x2={C + 157 * Math.cos(rad)} y2={C + 157 * Math.sin(rad)}
+            x1={r4(C + 30 * Math.cos(rad))} y1={r4(C + 30 * Math.sin(rad))}
+            x2={r4(C + 157 * Math.cos(rad))} y2={r4(C + 157 * Math.sin(rad))}
             stroke="#181818" strokeWidth="0.5"
           />
         );
@@ -391,8 +392,9 @@ function SubmitButton({ loading }: { loading: boolean }) {
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
 
-function Nav({ scrolled }: { scrolled: boolean }) {
+function Nav({ scrolled, onPortalOpen }: { scrolled: boolean; onPortalOpen: () => void }) {
   const [hov, setHov] = useState(false);
+  const [portalHov, setPortalHov] = useState(false);
   const loaded = useLoaded(300);
 
   return (
@@ -435,26 +437,50 @@ function Nav({ scrolled }: { scrolled: boolean }) {
           Aurea
         </span>
 
-        <a
-          href="#apply"
-          onMouseEnter={() => setHov(true)}
-          onMouseLeave={() => setHov(false)}
-          style={{
-            fontFamily: T.sans,
-            fontSize: "0.5625rem",
-            fontWeight: 500,
-            letterSpacing: "0.22em",
-            textTransform: "uppercase",
-            textDecoration: "none",
-            padding: "0.625rem 1.25rem",
-            border: `1px solid ${hov ? T.gold : "rgba(201,168,76,0.3)"}`,
-            color: hov ? T.bg : T.gold,
-            background: hov ? T.gold : "transparent",
-            transition: "all 0.25s ease",
-          }}
-        >
-          Apply
-        </a>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          {/* My Health Portal tile */}
+          <button
+            onClick={onPortalOpen}
+            onMouseEnter={() => setPortalHov(true)}
+            onMouseLeave={() => setPortalHov(false)}
+            style={{
+              fontFamily: T.sans,
+              fontSize: "0.5625rem",
+              fontWeight: 500,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              padding: "0.625rem 1.25rem",
+              border: `1px solid ${portalHov ? T.gold : "rgba(201,168,76,0.25)"}`,
+              color: portalHov ? T.gold : `rgba(201,168,76,0.65)`,
+              background: portalHov ? "rgba(201,168,76,0.06)" : "transparent",
+              cursor: "pointer",
+              transition: "all 0.25s ease",
+            }}
+          >
+            My Health Portal
+          </button>
+
+          <a
+            href="#apply"
+            onMouseEnter={() => setHov(true)}
+            onMouseLeave={() => setHov(false)}
+            style={{
+              fontFamily: T.sans,
+              fontSize: "0.5625rem",
+              fontWeight: 500,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              textDecoration: "none",
+              padding: "0.625rem 1.25rem",
+              border: `1px solid ${hov ? T.gold : "rgba(201,168,76,0.3)"}`,
+              color: hov ? T.bg : T.gold,
+              background: hov ? T.gold : "transparent",
+              transition: "all 0.25s ease",
+            }}
+          >
+            Apply
+          </a>
+        </div>
       </div>
     </nav>
   );
@@ -1095,10 +1121,209 @@ function Footer() {
   );
 }
 
+// ─── Health Portal Panel ──────────────────────────────────────────────────────
+
+function HealthPortalPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [acctHov, setAcctHov] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
+
+  // Trap focus / close on Escape
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!mounted) return null;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 90,
+          background: "rgba(0,0,0,0.55)",
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? "auto" : "none",
+          transition: "opacity 0.35s ease",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Slide-in panel */}
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-label="My Health Portal"
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 100,
+          width: "min(420px, 92vw)",
+          background: T.bg2,
+          borderLeft: `1px solid rgba(201,168,76,0.18)`,
+          display: "flex",
+          flexDirection: "column",
+          transform: open ? "translateX(0)" : "translateX(100%)",
+          transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1)",
+          willChange: "transform",
+        }}
+      >
+        {/* Header row */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "1.75rem 2rem 1.5rem",
+            borderBottom: `1px solid ${T.border}`,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: T.sans,
+              fontSize: "0.5rem",
+              fontWeight: 500,
+              letterSpacing: "0.26em",
+              textTransform: "uppercase",
+              color: T.gold,
+            }}
+          >
+            My Health Portal
+          </span>
+          <button
+            onClick={onClose}
+            aria-label="Close panel"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: T.sub,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0.25rem",
+              lineHeight: 1,
+              transition: "color 0.2s ease",
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = T.text)}
+            onMouseLeave={e => (e.currentTarget.style.color = T.sub)}
+          >
+            {/* × SVG */}
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <line x1="2" y1="2" x2="14" y2="14" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/>
+              <line x1="14" y1="2" x2="2" y2="14" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ flex: 1, padding: "2.5rem 2rem", display: "flex", flexDirection: "column", gap: "2rem" }}>
+          {/* Wordmark */}
+          <span
+            style={{
+              fontFamily: T.display,
+              fontSize: "1.75rem",
+              fontWeight: 400,
+              letterSpacing: "0.06em",
+              color: T.text,
+              lineHeight: 1.2,
+            }}
+          >
+            Aurea Health
+          </span>
+
+          {/* Welcome copy */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+            <p
+              style={{
+                fontFamily: T.sans,
+                fontSize: "0.8125rem",
+                fontWeight: 400,
+                lineHeight: 1.7,
+                color: T.text,
+                margin: 0,
+              }}
+            >
+              Welcome to your member portal.
+            </p>
+            <p
+              style={{
+                fontFamily: T.sans,
+                fontSize: "0.8125rem",
+                fontWeight: 300,
+                lineHeight: 1.7,
+                color: T.sub,
+                margin: 0,
+              }}
+            >
+              Access your protocol, biomarker history, and advisor communications — all in one place.
+            </p>
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: "1px", background: T.border }} />
+
+          {/* My Account button */}
+          <a
+            href="/login"
+            onMouseEnter={() => setAcctHov(true)}
+            onMouseLeave={() => setAcctHov(false)}
+            style={{
+              display: "block",
+              fontFamily: T.sans,
+              fontSize: "0.5625rem",
+              fontWeight: 500,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              textDecoration: "none",
+              textAlign: "center",
+              padding: "0.875rem 1.75rem",
+              border: `1px solid ${acctHov ? T.gold : "rgba(201,168,76,0.3)"}`,
+              color: acctHov ? T.bg : T.gold,
+              background: acctHov ? T.gold : "transparent",
+              cursor: "pointer",
+              width: "100%",
+              boxSizing: "border-box",
+              transition: "all 0.25s ease",
+            }}
+          >
+            My Account
+          </a>
+        </div>
+
+        {/* Footer note */}
+        <div style={{ padding: "1.25rem 2rem", borderTop: `1px solid ${T.border}` }}>
+          <p
+            style={{
+              fontFamily: T.sans,
+              fontSize: "0.5625rem",
+              letterSpacing: "0.08em",
+              color: "#282828",
+              margin: 0,
+            }}
+          >
+            Aurea Health &mdash; Member Access
+          </p>
+        </div>
+      </aside>
+    </>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
   const scrolled = useScrolled(56);
+  const [portalOpen, setPortalOpen] = useState(false);
   const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
@@ -1131,7 +1356,8 @@ export default function Home() {
 
   return (
     <div style={{ background: T.bg, minHeight: "100vh" }}>
-      <Nav scrolled={scrolled} />
+      <Nav scrolled={scrolled} onPortalOpen={() => setPortalOpen(true)} />
+      <HealthPortalPanel open={portalOpen} onClose={() => setPortalOpen(false)} />
       <Hero />
       <Manifesto />
       <ServicesSection />
