@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 
@@ -460,6 +460,14 @@ export default function DashboardPage() {
   const [workout,     setWorkout]     = useState<WorkoutRow | null | undefined>(undefined);
   const [checkin,     setCheckin]     = useState<CheckinRow | null | undefined>(undefined);
 
+  const [isMobile, setIsMobile] = React.useState(false);
+  React.useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   useEffect(() => {
     const supabase = createClient();
 
@@ -553,13 +561,13 @@ export default function DashboardPage() {
       }}>
 
         {/* Row 1: Whoop + DEXA */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem", marginBottom: "1.25rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "1.25rem", marginBottom: "1.25rem" }}>
           <WhoopCard data={whoop ?? null} />
           <DexaCard  data={dexa  ?? null} />
         </div>
 
         {/* Row 2: Supplements + Nutrition + Check-in */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.25rem", marginBottom: "1.25rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: "1.25rem", marginBottom: "1.25rem" }}>
           <SupplementCard data={supplements ?? null} />
           <NutritionCard  data={nutrition   ?? null} />
           <CheckInCard    data={checkin     ?? null} />
