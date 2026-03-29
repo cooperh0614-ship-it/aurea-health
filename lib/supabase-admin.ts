@@ -12,9 +12,9 @@ export async function getAdminUser(request: Request) {
   const token = request.headers.get("Authorization")?.replace("Bearer ", "");
   if (!token) return null;
   const supabase = createAdminClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser(token);
-  if (!user || user.email !== process.env.ADMIN_EMAIL) return null;
-  return user;
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data.user) return null;
+  const adminEmail = (process.env.ADMIN_EMAIL ?? "").toLowerCase().trim();
+  if (!adminEmail || (data.user.email ?? "").toLowerCase().trim() !== adminEmail) return null;
+  return data.user;
 }

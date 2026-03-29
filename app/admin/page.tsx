@@ -503,6 +503,15 @@ export default function AdminPage() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) { router.replace("/login"); return; }
 
+      // Check admin email directly from the session — no API round-trip needed.
+      // NEXT_PUBLIC_ADMIN_EMAIL must match ADMIN_EMAIL in your env.
+      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.toLowerCase().trim();
+      const userEmail  = (session.user.email ?? "").toLowerCase().trim();
+      if (!adminEmail || userEmail !== adminEmail) {
+        router.replace("/dashboard");
+        return;
+      }
+
       const tok = session.access_token;
       setToken(tok);
       setLoadingProfiles(true);
@@ -511,8 +520,11 @@ export default function AdminPage() {
         headers: { Authorization: `Bearer ${tok}` },
       });
 
-      if (res.status === 401) {
-        router.replace("/dashboard");
+      if (!res.ok) {
+        // Profiles table may not exist yet — still show the panel so the
+        // admin can use Add New Client to get started.
+        setLoadingProfiles(false);
+        setChecking(false);
         return;
       }
 
