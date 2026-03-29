@@ -40,7 +40,11 @@ export default function LoginPage() {
       setError("Invalid email or password.");
       setLoading(false);
     } else {
-      router.push("/dashboard");
+      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.toLowerCase().trim();
+      const destination = adminEmail && email.toLowerCase().trim() === adminEmail
+        ? "/admin"
+        : "/dashboard";
+      router.push(destination);
     }
   }
 
