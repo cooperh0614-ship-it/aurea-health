@@ -61,10 +61,22 @@ type NutritionFields = {
   notes: string;
 };
 
+type WorkoutMove = {
+  name: string;
+  sets: string;
+  note: string;
+};
+
+type WorkoutDay = {
+  day: string;
+  label: string;
+  moves: WorkoutMove[];
+};
+
 type WorkoutFields = {
   id: string | null;
   block_name: string;
-  plan_content: string;
+  days: WorkoutDay[];
 };
 
 type CheckinFields = {
@@ -107,7 +119,7 @@ const defaultDexa: DexaFields = {
 const defaultNutrition: NutritionFields = {
   id: null, calories: "", protein_g: "", carbs_g: "", fat_g: "", notes: "",
 };
-const defaultWorkout: WorkoutFields = { id: null, block_name: "", plan_content: "" };
+const defaultWorkout: WorkoutFields = { id: null, block_name: "", days: [] };
 const defaultCheckin: CheckinFields = {
   id: null, checkin_date: "", checkin_time: "", duration: "", format: "", agenda: "",
 };
@@ -297,24 +309,230 @@ function NutritionForm({ data, onChange }: { data: NutritionFields; onChange: (d
 // ─── Tab: Workouts ────────────────────────────────────────────────────────────
 
 function WorkoutForm({ data, onChange }: { data: WorkoutFields; onChange: (d: WorkoutFields) => void }) {
-  const set = (key: keyof WorkoutFields) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      onChange({ ...data, [key]: e.target.value });
+  function setDay(di: number, key: "day" | "label", val: string) {
+    onChange({
+      ...data,
+      days: data.days.map((d, i) => i === di ? { ...d, [key]: val } : d),
+    });
+  }
+
+  function setMove(di: number, mi: number, key: keyof WorkoutMove, val: string) {
+    onChange({
+      ...data,
+      days: data.days.map((d, i) => {
+        if (i !== di) return d;
+        return { ...d, moves: d.moves.map((m, j) => j === mi ? { ...m, [key]: val } : m) };
+      }),
+    });
+  }
+
+  function addDay() {
+    onChange({ ...data, days: [...data.days, { day: "", label: "", moves: [] }] });
+  }
+
+  function removeDay(di: number) {
+    onChange({ ...data, days: data.days.filter((_, i) => i !== di) });
+  }
+
+  function addMove(di: number) {
+    onChange({
+      ...data,
+      days: data.days.map((d, i) =>
+        i === di ? { ...d, moves: [...d.moves, { name: "", sets: "", note: "" }] } : d
+      ),
+    });
+  }
+
+  function removeMove(di: number, mi: number) {
+    onChange({
+      ...data,
+      days: data.days.map((d, i) =>
+        i === di ? { ...d, moves: d.moves.filter((_, j) => j !== mi) } : d
+      ),
+    });
+  }
+
+  const colLabel: React.CSSProperties = {
+    fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
+    letterSpacing: "0.22em", textTransform: "uppercase",
+    color: "rgba(245,240,232,0.35)",
+  };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      {/* Block name */}
       <Field label="Block Name">
-        <input style={inputSt} type="text" value={data.block_name} onChange={set("block_name")} placeholder="e.g. Hypertrophy Block 1" />
-      </Field>
-      <Field label="Plan Content (JSON)">
-        <textarea
-          style={{ ...textareaSt, minHeight: "14rem", fontFamily: "monospace", fontSize: "0.75rem" }}
-          value={data.plan_content}
-          onChange={set("plan_content")}
-          placeholder={'[{"day":"Mon","label":"Upper","moves":[{"name":"Bench Press","sets":"4×8"}]}]'}
-          spellCheck={false}
+        <input
+          style={inputSt}
+          type="text"
+          value={data.block_name}
+          onChange={e => onChange({ ...data, block_name: e.target.value })}
+          placeholder="e.g. Hypertrophy Block 1"
         />
       </Field>
+
+      {/* Days */}
+      {data.days.length === 0 && (
+        <p style={{
+          fontFamily: SANS, fontSize: "0.8125rem", fontWeight: 300,
+          color: "rgba(245,240,232,0.2)", fontStyle: "italic", margin: 0,
+        }}>
+          No training days yet. Add one below.
+        </p>
+      )}
+
+      {data.days.map((day, di) => (
+        <div
+          key={di}
+          style={{
+            background: "#0d0d0d",
+            border: "1px solid #1c1c1c",
+            padding: "1rem",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.875rem",
+          }}
+        >
+          {/* Day header row */}
+          <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-end" }}>
+            <div style={{ width: "90px", flexShrink: 0 }}>
+              <Field label="Day">
+                <input
+                  style={inputSt}
+                  type="text"
+                  value={day.day}
+                  onChange={e => setDay(di, "day", e.target.value)}
+                  placeholder="Mon"
+                />
+              </Field>
+            </div>
+            <div style={{ flex: 1 }}>
+              <Field label="Label">
+                <input
+                  style={inputSt}
+                  type="text"
+                  value={day.label}
+                  onChange={e => setDay(di, "label", e.target.value)}
+                  placeholder="Upper Push"
+                />
+              </Field>
+            </div>
+            <button
+              onClick={() => removeDay(di)}
+              style={{
+                fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
+                letterSpacing: "0.15em", textTransform: "uppercase",
+                color: "rgba(255,80,80,0.5)",
+                background: "none",
+                border: "1px solid rgba(255,80,80,0.2)",
+                padding: "0.625rem 0.75rem",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              Remove Day
+            </button>
+          </div>
+
+          {/* Exercise column headers */}
+          {day.moves.length > 0 && (
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "2fr 1fr 1fr 28px",
+              gap: "0.5rem",
+              paddingLeft: "0.125rem",
+            }}>
+              <span style={colLabel}>Exercise</span>
+              <span style={colLabel}>Sets</span>
+              <span style={colLabel}>Note</span>
+              <span />
+            </div>
+          )}
+
+          {/* Exercise rows */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            {day.moves.map((move, mi) => (
+              <div
+                key={mi}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "2fr 1fr 1fr 28px",
+                  gap: "0.5rem",
+                  alignItems: "center",
+                }}
+              >
+                <input
+                  style={inputSt}
+                  type="text"
+                  value={move.name}
+                  onChange={e => setMove(di, mi, "name", e.target.value)}
+                  placeholder="Exercise name"
+                />
+                <input
+                  style={inputSt}
+                  type="text"
+                  value={move.sets}
+                  onChange={e => setMove(di, mi, "sets", e.target.value)}
+                  placeholder="4×8"
+                />
+                <input
+                  style={inputSt}
+                  type="text"
+                  value={move.note}
+                  onChange={e => setMove(di, mi, "note", e.target.value)}
+                  placeholder="Optional"
+                />
+                <button
+                  onClick={() => removeMove(di, mi)}
+                  style={{
+                    fontFamily: SANS, fontSize: "0.75rem",
+                    color: "rgba(255,80,80,0.45)",
+                    background: "none",
+                    border: "1px solid rgba(255,80,80,0.15)",
+                    width: "28px", height: "28px",
+                    cursor: "pointer",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Add exercise */}
+          <button
+            onClick={() => addMove(di)}
+            style={{
+              fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
+              letterSpacing: "0.18em", textTransform: "uppercase",
+              padding: "0.5rem 0.75rem",
+              border: "1px solid rgba(201,168,76,0.2)",
+              color: "rgba(201,168,76,0.6)",
+              background: "transparent", cursor: "pointer",
+              alignSelf: "flex-start",
+            }}
+          >
+            + Add Exercise
+          </button>
+        </div>
+      ))}
+
+      {/* Add day */}
+      <button
+        onClick={addDay}
+        style={{
+          fontFamily: SANS, fontSize: "0.5625rem", fontWeight: 500,
+          letterSpacing: "0.18em", textTransform: "uppercase",
+          padding: "0.625rem",
+          border: "1px solid rgba(201,168,76,0.25)",
+          color: GOLD, background: "transparent", cursor: "pointer",
+        }}
+      >
+        + Add Training Day
+      </button>
     </div>
   );
 }
@@ -650,10 +868,14 @@ export default function AdminPage() {
     } : defaultNutrition);
 
     const wo = workoutRes.data;
+    let parsedDays: WorkoutDay[] = [];
+    if (wo?.plan_content) {
+      try { parsedDays = JSON.parse(wo.plan_content); } catch { parsedDays = []; }
+    }
     setWorkout(wo ? {
       id: wo.id,
       block_name: s(wo.block_name),
-      plan_content: s(wo.plan_content),
+      days: parsedDays,
     } : defaultWorkout);
 
     const ci = checkinRes.data;
@@ -779,7 +1001,17 @@ export default function AdminPage() {
         id: workout.id,
         data: {
           block_name: workout.block_name || null,
-          plan_content: workout.plan_content || null,
+          plan_content: workout.days.length > 0
+            ? JSON.stringify(workout.days.map(d => ({
+                day: d.day,
+                label: d.label,
+                moves: d.moves.map(m => ({
+                  name: m.name,
+                  sets: m.sets,
+                  ...(m.note ? { note: m.note } : {}),
+                })),
+              })))
+            : null,
         },
       };
     } else {
