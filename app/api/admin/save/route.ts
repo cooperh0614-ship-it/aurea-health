@@ -1,6 +1,7 @@
 import { getAdminUser, createAdminClient } from "@/lib/supabase-admin";
 
 const VALID_TABLES = new Set([
+  "profiles",
   "whoop_data",
   "dexa_scans",
   "supplements",
@@ -21,6 +22,17 @@ export async function POST(request: Request) {
   }
 
   const supabase = createAdminClient();
+
+  // Profiles: always UPDATE — row was created when the user was created
+  if (table === "profiles") {
+    const { data } = body;
+    const { error } = await supabase
+      .from("profiles")
+      .update(data)
+      .eq("id", userId);
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ success: true });
+  }
 
   // Supplements: multi-row upsert/delete
   if (table === "supplements") {

@@ -10,6 +10,7 @@ const ORDER_COLS: Record<string, string> = {
 };
 
 const VALID_TABLES = new Set([
+  "profiles",
   "whoop_data",
   "dexa_scans",
   "supplements",
@@ -30,6 +31,17 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = createAdminClient();
+
+  // profiles uses `id` as PK (= the user's auth id), not a separate user_id col
+  if (table === "profiles") {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle();
+    if (error) return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ data });
+  }
 
   if (table === "supplements") {
     const { data, error } = await supabase

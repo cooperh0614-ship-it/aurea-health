@@ -22,6 +22,7 @@ type Profile = {
 };
 
 type Tab =
+  | "profiles"
   | "whoop_data"
   | "dexa_scans"
   | "supplements"
@@ -75,6 +76,15 @@ type CheckinFields = {
   agenda: string;
 };
 
+type ProfileFields = {
+  full_name: string;
+  email: string;
+  age: string;
+  weight_lbs: string;
+  height_in: string;
+  notes: string;
+};
+
 type SupplementRow = {
   id: string | null;
   name: string;
@@ -100,6 +110,9 @@ const defaultNutrition: NutritionFields = {
 const defaultWorkout: WorkoutFields = { id: null, block_name: "", plan_content: "" };
 const defaultCheckin: CheckinFields = {
   id: null, checkin_date: "", checkin_time: "", duration: "", format: "", agenda: "",
+};
+const defaultProfile: ProfileFields = {
+  full_name: "", email: "", age: "", weight_lbs: "", height_in: "", notes: "",
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -183,6 +196,39 @@ function WhoopForm({ data, onChange }: { data: WhoopFields; onChange: (d: WhoopF
       </Field>
       <Field label="Synced At">
         <input style={inputSt} type="datetime-local" value={data.synced_at} onChange={set("synced_at")} />
+      </Field>
+    </div>
+  );
+}
+
+// ─── Tab: Profile ─────────────────────────────────────────────────────────────
+
+function ProfileForm({ data, onChange }: { data: ProfileFields; onChange: (d: ProfileFields) => void }) {
+  const set = (key: keyof ProfileFields) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      onChange({ ...data, [key]: e.target.value });
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+        <Field label="Full Name">
+          <input style={inputSt} type="text" value={data.full_name} onChange={set("full_name")} placeholder="John Smith" />
+        </Field>
+        <Field label="Email">
+          <input style={inputSt} type="email" value={data.email} onChange={set("email")} placeholder="client@example.com" />
+        </Field>
+        <Field label="Age">
+          <input style={inputSt} type="number" value={data.age} onChange={set("age")} placeholder="—" />
+        </Field>
+        <Field label="Weight (lbs)">
+          <input style={inputSt} type="number" step="0.1" value={data.weight_lbs} onChange={set("weight_lbs")} placeholder="—" />
+        </Field>
+        <Field label="Height (inches)">
+          <input style={inputSt} type="number" step="0.1" value={data.height_in} onChange={set("height_in")} placeholder="e.g. 70 for 5′10″" />
+        </Field>
+      </div>
+      <Field label="Notes">
+        <textarea style={textareaSt} value={data.notes} onChange={set("notes")} placeholder="Client notes…" />
       </Field>
     </div>
   );
@@ -442,6 +488,7 @@ function SupplementsForm({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const TABS: Tab[] = [
+  "profiles",
   "whoop_data",
   "dexa_scans",
   "supplements",
@@ -451,6 +498,7 @@ const TABS: Tab[] = [
 ];
 
 const TAB_LABELS: Record<Tab, string> = {
+  profiles: "Profile",
   whoop_data: "Whoop",
   dexa_scans: "DEXA",
   supplements: "Supplements",
@@ -477,6 +525,7 @@ export default function AdminPage() {
   const [loadingData, setLoadingData] = useState(false);
 
   // ── Tab form states ───────────────────────────────────────────────────────
+  const [profile,     setProfile]     = useState<ProfileFields>(defaultProfile);
   const [whoop,       setWhoop]       = useState<WhoopFields>(defaultWhoop);
   const [dexa,        setDexa]        = useState<DexaFields>(defaultDexa);
   const [nutrition,   setNutrition]   = useState<NutritionFields>(defaultNutrition);
@@ -545,8 +594,9 @@ export default function AdminPage() {
       fetch(`/api/admin/user-data?userId=${userId}&table=${table}`, { headers: hdrs })
         .then(r => r.json());
 
-    const [whoopRes, dexaRes, suppRes, nutritionRes, workoutRes, checkinRes] =
+    const [profileRes, whoopRes, dexaRes, suppRes, nutritionRes, workoutRes, checkinRes] =
       await Promise.all([
+        get("profiles"),
         get("whoop_data"),
         get("dexa_scans"),
         get("supplements"),
@@ -554,6 +604,16 @@ export default function AdminPage() {
         get("workout_plans"),
         get("checkins"),
       ]);
+
+    const pr = profileRes.data;
+    setProfile(pr ? {
+      full_name: s(pr.full_name),
+      email: s(pr.email),
+      age: n(pr.age),
+      weight_lbs: n(pr.weight_lbs),
+      height_in: n(pr.height_in),
+      notes: s(pr.notes),
+    } : defaultProfile);
 
     const w = whoopRes.data;
     setWhoop(w ? {
@@ -623,7 +683,7 @@ export default function AdminPage() {
 
   async function selectClient(id: string) {
     setSelectedId(id);
-    setActiveTab("whoop_data");
+    setActiveTab("profiles");
     setSaveMsg("");
     await loadClientData(id, token);
   }
@@ -655,6 +715,19 @@ export default function AdminPage() {
           active: row.active,
         })),
         deletedIds: deletedSupIds,
+      };
+    } else if (activeTab === "profiles") {
+      body = {
+        table: "profiles",
+        userId: selectedId,
+        data: {
+          full_name: profile.full_name || null,
+          email: profile.email || null,
+          age: profile.age !== "" ? Number(profile.age) : null,
+          weight_lbs: profile.weight_lbs !== "" ? Number(profile.weight_lbs) : null,
+          height_in: profile.height_in !== "" ? Number(profile.height_in) : null,
+          notes: profile.notes || null,
+        },
       };
     } else if (activeTab === "whoop_data") {
       body = {
@@ -738,8 +811,17 @@ export default function AdminPage() {
       setSaveMsg(`Error: ${result.error}`);
     } else {
       setSaveMsg("Saved.");
-      // Reload to sync IDs for newly inserted rows
       await loadClientData(selectedId, token);
+      // Refresh sidebar names when profile is edited
+      if (activeTab === "profiles") {
+        const profilesRes = await fetch("/api/admin/profiles", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (profilesRes.ok) {
+          const { data: updatedProfiles } = await profilesRes.json();
+          setProfiles(updatedProfiles ?? []);
+        }
+      }
     }
 
     setSaving(false);
@@ -1012,6 +1094,7 @@ export default function AdminPage() {
                 transition: "opacity 0.2s ease",
                 pointerEvents: loadingData ? "none" : "auto",
               }}>
+                {activeTab === "profiles"          && <ProfileForm data={profile} onChange={setProfile} />}
                 {activeTab === "whoop_data"      && <WhoopForm data={whoop} onChange={setWhoop} />}
                 {activeTab === "dexa_scans"       && <DexaForm data={dexa} onChange={setDexa} />}
                 {activeTab === "nutrition_plans"  && <NutritionForm data={nutrition} onChange={setNutrition} />}
