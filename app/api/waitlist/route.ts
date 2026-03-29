@@ -7,7 +7,7 @@ function isValidEmail(email: string): boolean {
 }
 
 async function addToResend(
-  firstName: string,
+  full_name: string,
   email: string
 ): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
@@ -27,7 +27,7 @@ async function addToResend(
       },
       body: JSON.stringify({
         email,
-        first_name: firstName,
+        first_name: full_name,
         unsubscribed: false,
       }),
     }
@@ -39,14 +39,14 @@ async function addToResend(
   }
 }
 
-function saveToCSV(firstName: string, email: string): void {
+function saveToCSV(full_name: string, email: string): void {
   // /tmp is writable in serverless environments; fine for local dev too
   const filePath = path.join("/tmp", "aurea-waitlist.csv");
   const timestamp = new Date().toISOString();
-  const row = `${timestamp},"${firstName.replace(/"/g, '""')}","${email.replace(/"/g, '""')}"\n`;
+  const row = `${timestamp},"${full_name.replace(/"/g, '""')}","${email.replace(/"/g, '""')}"\n`;
 
   if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, "timestamp,first_name,email\n");
+    fs.writeFileSync(filePath, "timestamp,full_name,email\n");
   }
   fs.appendFileSync(filePath, row);
 }
@@ -62,23 +62,23 @@ export async function POST(req: NextRequest) {
   if (
     typeof body !== "object" ||
     body === null ||
-    !("firstName" in body) ||
+    !("full_name" in body) ||
     !("email" in body)
   ) {
     return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
   }
 
-  const { firstName, email } = body as { firstName: unknown; email: unknown };
+  const { full_name, email } = body as { full_name: unknown; email: unknown };
 
-  if (typeof firstName !== "string" || firstName.trim().length === 0) {
-    return NextResponse.json({ error: "First name is required." }, { status: 400 });
+  if (typeof full_name !== "string" || full_name.trim().length === 0) {
+    return NextResponse.json({ error: "Full name is required." }, { status: 400 });
   }
 
   if (typeof email !== "string" || !isValidEmail(email)) {
     return NextResponse.json({ error: "A valid email address is required." }, { status: 400 });
   }
 
-  const cleanFirst = firstName.trim().slice(0, 100);
+  const cleanName  = full_name.trim().slice(0, 100);
   const cleanEmail = email.trim().toLowerCase().slice(0, 254);
 
   const resendConfigured =
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 
   if (resendConfigured) {
     try {
-      await addToResend(cleanFirst, cleanEmail);
+      await addToResend(cleanName, cleanEmail);
     } catch (err) {
       console.error("[waitlist] Resend error:", err);
       return NextResponse.json(
@@ -97,8 +97,8 @@ export async function POST(req: NextRequest) {
   } else {
     // Fallback: write to CSV (local dev / when Resend isn't configured)
     try {
-      saveToCSV(cleanFirst, cleanEmail);
-      console.log(`[waitlist] Saved to CSV: ${cleanFirst} <${cleanEmail}>`);
+      saveToCSV(cleanName, cleanEmail);
+      console.log(`[waitlist] Saved to CSV: ${cleanName} <${cleanEmail}>`);
     } catch (err) {
       console.error("[waitlist] CSV write error:", err);
       // Don't fail the request if CSV write fails — just log it

@@ -1062,7 +1062,7 @@ function ApplicationSection({
             </div>
           ) : (
             <form ref={formRef} onSubmit={onSubmit} style={{ textAlign: "left" }}>
-              <FormField id="firstName" label="First Name" type="text" placeholder="James" autoComplete="given-name" />
+              <FormField id="full_name" label="Full Name" type="text" placeholder="James Smith" autoComplete="name" />
               <FormField id="email" label="Email Address" type="email" placeholder="james@example.com" autoComplete="email" />
 
               {formState === "error" && (
@@ -1338,7 +1338,7 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName: data.get("firstName") as string,
+          full_name: data.get("full_name") as string,
           email: data.get("email") as string,
         }),
       });
