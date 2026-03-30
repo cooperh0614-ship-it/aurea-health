@@ -87,22 +87,22 @@ const SERVICES = [
   {
     n: "01",
     title: "Blood Work Interpretation",
-    body: "Your labs contain more information than any appointment allows time to explain. We read your full panel — hormones, metabolic markers, inflammatory indicators — and build a clear, actionable picture of what your biology is actually doing.",
+    body: "Your labs contain more information than any appointment allows time to explain. We read your full panel: hormones, metabolic markers, inflammatory indicators. Then we build a clear picture of what your biology is actually doing.",
   },
   {
     n: "02",
     title: "Supplement Protocol",
-    body: "No guessing. No generic stacks. Your protocol is built from your bloodwork, your goals, and your lifestyle. We specify what, when, and in what form — and adjust as your markers change.",
+    body: "No guessing. No generic stacks. Your protocol is built from your bloodwork, your goals, and your lifestyle. We specify what, when, and in what form. We adjust as your markers change.",
   },
   {
     n: "03",
     title: "Nutrition Architecture",
-    body: "Not a meal plan. A framework — built around your biology, your schedule, and what your output demands. Specific enough to drive real change. Adaptable enough to survive your life.",
+    body: "Not a meal plan. A framework built around your biology, your schedule, and what your output demands. Specific enough to drive real change. Adaptable enough to survive your life.",
   },
   {
     n: "04",
     title: "Training Programming",
-    body: "Your capacity for stress and recovery is measurable. We measure it, then build around it — training that accounts for your hormonal state, recovery status, and long-term trajectory.",
+    body: "Your capacity for stress and recovery is measurable. We measure it, then build around it. Training that accounts for your hormonal state, your recovery status, and where you're trying to go.",
   },
 ] as const;
 
@@ -119,15 +119,15 @@ const STEPS = [
   },
   {
     n: "03",
-    title: "Ongoing Optimization",
-    body: "Monthly check-ins, quarterly lab reviews, direct advisor access. Your protocol evolves as your biology does.",
+    title: "Ongoing Review",
+    body: "Monthly check-ins, quarterly lab reviews, direct advisor access. Your protocol gets adjusted as your numbers do.",
   },
 ] as const;
 
 const HERO_STATS = [
   { value: "< 50", label: "Members per cohort" },
   { value: "5 days", label: "Protocol delivery" },
-  { value: "Monthly", label: "Optimization reviews" },
+  { value: "Monthly", label: "Progress reviews" },
 ] as const;
 
 // ─── Biomarker Ring Visual ─────────────────────────────────────────────────────
@@ -547,7 +547,7 @@ function Hero() {
                   color: T.gold,
                 }}
               >
-                Private Membership&ensp;&middot;&ensp;By Application&ensp;&middot;&ensp;$1,000&thinsp;/&thinsp;mo
+                Private Membership&ensp;&middot;&ensp;By Application
               </div>
             </div>
 
@@ -704,7 +704,7 @@ function Manifesto() {
               color: T.text,
             }}
           >
-            High performers optimize every variable that drives results.
+            High performers manage every variable that drives results.
           </p>
           <p
             style={{
@@ -938,9 +938,9 @@ function MembershipSection() {
                 maxWidth: "440px",
               }}
             >
-              You track your inputs, protect your output, and optimize every
-              system under your control. Aurea applies that same rigor to the
-              one system everything runs on — your body.
+              You track your inputs, protect your output, and run a tight
+              operation. Aurea applies that same rigor to the one system
+              everything runs on: your body.
               <br />
               <br />
               We handle the complexity. Your only job is to show up and perform.
@@ -951,7 +951,7 @@ function MembershipSection() {
             {[
               {
                 q: "Who this is for",
-                a: "High performers who optimize everything that matters — and are ready to bring that same precision to their biology.",
+                a: "High performers who run a tight operation and are ready to bring that same standard to their biology.",
               },
               {
                 q: "What you bring",
@@ -959,7 +959,7 @@ function MembershipSection() {
               },
               {
                 q: "What we deliver",
-                a: "A complete, personalized protocol. A dedicated advisor. Continuous optimization as your data shifts.",
+                a: "A complete protocol built around your data. A dedicated advisor. Adjustments as your results come in.",
               },
               {
                 q: "What this is not",
