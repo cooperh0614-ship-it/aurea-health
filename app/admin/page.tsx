@@ -145,12 +145,16 @@ const inputSt: React.CSSProperties = {
   border: "1px solid #242424",
   color: TEXT,
   fontFamily: SANS,
-  fontSize: "0.8125rem",
+  // 16px prevents iOS auto-zoom on focus
+  fontSize: "1rem",
   fontWeight: 300,
   padding: "0.625rem 0.875rem",
   outline: "none",
   caretColor: GOLD,
   transition: "border-color 0.2s ease",
+  borderRadius: 0,
+  appearance: "none",
+  WebkitAppearance: "none",
 };
 
 const textareaSt: React.CSSProperties = {
@@ -179,12 +183,16 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 // ─── Tab: Whoop ───────────────────────────────────────────────────────────────
 
-function WhoopForm({ data, onChange }: { data: WhoopFields; onChange: (d: WhoopFields) => void }) {
+function WhoopForm({ data, onChange, isMobile }: {
+  data: WhoopFields;
+  onChange: (d: WhoopFields) => void;
+  isMobile?: boolean;
+}) {
   const set = (key: keyof WhoopFields) =>
     (e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...data, [key]: e.target.value });
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "1rem" }}>
       <Field label="Recovery Score">
         <input style={inputSt} type="number" step="0.1" value={data.recovery_score} onChange={set("recovery_score")} placeholder="—" />
       </Field>
@@ -215,14 +223,18 @@ function WhoopForm({ data, onChange }: { data: WhoopFields; onChange: (d: WhoopF
 
 // ─── Tab: Profile ─────────────────────────────────────────────────────────────
 
-function ProfileForm({ data, onChange }: { data: ProfileFields; onChange: (d: ProfileFields) => void }) {
+function ProfileForm({ data, onChange, isMobile }: {
+  data: ProfileFields;
+  onChange: (d: ProfileFields) => void;
+  isMobile?: boolean;
+}) {
   const set = (key: keyof ProfileFields) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       onChange({ ...data, [key]: e.target.value });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "1rem" }}>
         <Field label="Full Name">
           <input style={inputSt} type="text" value={data.full_name} onChange={set("full_name")} placeholder="John Smith" />
         </Field>
@@ -248,12 +260,16 @@ function ProfileForm({ data, onChange }: { data: ProfileFields; onChange: (d: Pr
 
 // ─── Tab: DEXA ────────────────────────────────────────────────────────────────
 
-function DexaForm({ data, onChange }: { data: DexaFields; onChange: (d: DexaFields) => void }) {
+function DexaForm({ data, onChange, isMobile }: {
+  data: DexaFields;
+  onChange: (d: DexaFields) => void;
+  isMobile?: boolean;
+}) {
   const set = (key: keyof DexaFields) =>
     (e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...data, [key]: e.target.value });
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "1rem" }}>
       <Field label="Scan Date">
         <input style={inputSt} type="date" value={data.scan_date} onChange={set("scan_date")} />
       </Field>
@@ -278,14 +294,18 @@ function DexaForm({ data, onChange }: { data: DexaFields; onChange: (d: DexaFiel
 
 // ─── Tab: Nutrition ───────────────────────────────────────────────────────────
 
-function NutritionForm({ data, onChange }: { data: NutritionFields; onChange: (d: NutritionFields) => void }) {
+function NutritionForm({ data, onChange, isMobile }: {
+  data: NutritionFields;
+  onChange: (d: NutritionFields) => void;
+  isMobile?: boolean;
+}) {
   const set = (key: keyof NutritionFields) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       onChange({ ...data, [key]: e.target.value });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr", gap: "1rem" }}>
         <Field label="Calories (kcal)">
           <input style={inputSt} type="number" value={data.calories} onChange={set("calories")} placeholder="—" />
         </Field>
@@ -308,7 +328,11 @@ function NutritionForm({ data, onChange }: { data: NutritionFields; onChange: (d
 
 // ─── Tab: Workouts ────────────────────────────────────────────────────────────
 
-function WorkoutForm({ data, onChange }: { data: WorkoutFields; onChange: (d: WorkoutFields) => void }) {
+function WorkoutForm({ data, onChange, isMobile }: {
+  data: WorkoutFields;
+  onChange: (d: WorkoutFields) => void;
+  isMobile?: boolean;
+}) {
   function setDay(di: number, key: "day" | "label", val: string) {
     onChange({
       ...data,
@@ -358,6 +382,11 @@ function WorkoutForm({ data, onChange }: { data: WorkoutFields; onChange: (d: Wo
     color: "rgba(245,240,232,0.35)",
   };
 
+  const tapBtn: React.CSSProperties = {
+    minHeight: "44px", minWidth: "44px",
+    display: "flex", alignItems: "center", justifyContent: "center",
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
       {/* Block name */}
@@ -387,59 +416,67 @@ function WorkoutForm({ data, onChange }: { data: WorkoutFields; onChange: (d: Wo
           style={{
             background: "#0d0d0d",
             border: "1px solid #1c1c1c",
-            padding: "1rem",
+            padding: isMobile ? "0.875rem" : "1rem",
             display: "flex",
             flexDirection: "column",
             gap: "0.875rem",
           }}
         >
           {/* Day header row */}
-          <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-end" }}>
-            <div style={{ width: "90px", flexShrink: 0 }}>
-              <Field label="Day">
-                <input
-                  style={inputSt}
-                  type="text"
-                  value={day.day}
-                  onChange={e => setDay(di, "day", e.target.value)}
-                  placeholder="Mon"
-                />
-              </Field>
-            </div>
-            <div style={{ flex: 1 }}>
-              <Field label="Label">
-                <input
-                  style={inputSt}
-                  type="text"
-                  value={day.label}
-                  onChange={e => setDay(di, "label", e.target.value)}
-                  placeholder="Upper Push"
-                />
-              </Field>
+          <div style={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            gap: "0.75rem",
+            alignItems: isMobile ? "stretch" : "flex-end",
+          }}>
+            <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-end" }}>
+              <div style={{ width: isMobile ? "80px" : "90px", flexShrink: 0 }}>
+                <Field label="Day">
+                  <input
+                    style={inputSt}
+                    type="text"
+                    value={day.day}
+                    onChange={e => setDay(di, "day", e.target.value)}
+                    placeholder="Mon"
+                  />
+                </Field>
+              </div>
+              <div style={{ flex: 1 }}>
+                <Field label="Label">
+                  <input
+                    style={inputSt}
+                    type="text"
+                    value={day.label}
+                    onChange={e => setDay(di, "label", e.target.value)}
+                    placeholder="Upper Push"
+                  />
+                </Field>
+              </div>
             </div>
             <button
               onClick={() => removeDay(di)}
               style={{
+                ...tapBtn,
                 fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
                 letterSpacing: "0.15em", textTransform: "uppercase",
-                color: "rgba(255,80,80,0.5)",
+                color: "rgba(255,80,80,0.6)",
                 background: "none",
-                border: "1px solid rgba(255,80,80,0.2)",
-                padding: "0.625rem 0.75rem",
+                border: "1px solid rgba(255,80,80,0.25)",
+                padding: "0.5rem 0.875rem",
                 cursor: "pointer",
                 whiteSpace: "nowrap",
-                flexShrink: 0,
+                alignSelf: isMobile ? "flex-start" : "flex-end",
               }}
             >
               Remove Day
             </button>
           </div>
 
-          {/* Exercise column headers */}
-          {day.moves.length > 0 && (
+          {/* Exercise column headers — desktop only */}
+          {!isMobile && day.moves.length > 0 && (
             <div style={{
               display: "grid",
-              gridTemplateColumns: "2fr 1fr 1fr 28px",
+              gridTemplateColumns: "2fr 1fr 1fr 44px",
               gap: "0.5rem",
               paddingLeft: "0.125rem",
             }}>
@@ -451,54 +488,117 @@ function WorkoutForm({ data, onChange }: { data: WorkoutFields; onChange: (d: Wo
           )}
 
           {/* Exercise rows */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: isMobile ? "0.75rem" : "0.4rem" }}>
             {day.moves.map((move, mi) => (
-              <div
-                key={mi}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "2fr 1fr 1fr 28px",
-                  gap: "0.5rem",
-                  alignItems: "center",
-                }}
-              >
-                <input
-                  style={inputSt}
-                  type="text"
-                  value={move.name}
-                  onChange={e => setMove(di, mi, "name", e.target.value)}
-                  placeholder="Exercise name"
-                />
-                <input
-                  style={inputSt}
-                  type="text"
-                  value={move.sets}
-                  onChange={e => setMove(di, mi, "sets", e.target.value)}
-                  placeholder="4×8"
-                />
-                <input
-                  style={inputSt}
-                  type="text"
-                  value={move.note}
-                  onChange={e => setMove(di, mi, "note", e.target.value)}
-                  placeholder="Optional"
-                />
-                <button
-                  onClick={() => removeMove(di, mi)}
+              isMobile ? (
+                /* Mobile: stacked card per exercise */
+                <div
+                  key={mi}
                   style={{
-                    fontFamily: SANS, fontSize: "0.75rem",
-                    color: "rgba(255,80,80,0.45)",
-                    background: "none",
-                    border: "1px solid rgba(255,80,80,0.15)",
-                    width: "28px", height: "28px",
-                    cursor: "pointer",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    flexShrink: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.5rem",
+                    background: "#111111",
+                    border: "1px solid #1e1e1e",
+                    padding: "0.75rem",
                   }}
                 >
-                  ×
-                </button>
-              </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ ...colLabel, fontSize: "0.45rem" }}>Exercise {mi + 1}</span>
+                    <button
+                      onClick={() => removeMove(di, mi)}
+                      style={{
+                        ...tapBtn,
+                        fontFamily: SANS, fontSize: "0.75rem",
+                        color: "rgba(255,80,80,0.55)",
+                        background: "none",
+                        border: "1px solid rgba(255,80,80,0.2)",
+                        padding: "0.375rem 0.75rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ×  Remove
+                    </button>
+                  </div>
+                  <Field label="Exercise Name">
+                    <input
+                      style={inputSt}
+                      type="text"
+                      value={move.name}
+                      onChange={e => setMove(di, mi, "name", e.target.value)}
+                      placeholder="Exercise name"
+                    />
+                  </Field>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                    <Field label="Sets">
+                      <input
+                        style={inputSt}
+                        type="text"
+                        value={move.sets}
+                        onChange={e => setMove(di, mi, "sets", e.target.value)}
+                        placeholder="4×8"
+                      />
+                    </Field>
+                    <Field label="Note">
+                      <input
+                        style={inputSt}
+                        type="text"
+                        value={move.note}
+                        onChange={e => setMove(di, mi, "note", e.target.value)}
+                        placeholder="Optional"
+                      />
+                    </Field>
+                  </div>
+                </div>
+              ) : (
+                /* Desktop: inline row */
+                <div
+                  key={mi}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "2fr 1fr 1fr 44px",
+                    gap: "0.5rem",
+                    alignItems: "center",
+                  }}
+                >
+                  <input
+                    style={inputSt}
+                    type="text"
+                    value={move.name}
+                    onChange={e => setMove(di, mi, "name", e.target.value)}
+                    placeholder="Exercise name"
+                  />
+                  <input
+                    style={inputSt}
+                    type="text"
+                    value={move.sets}
+                    onChange={e => setMove(di, mi, "sets", e.target.value)}
+                    placeholder="4×8"
+                  />
+                  <input
+                    style={inputSt}
+                    type="text"
+                    value={move.note}
+                    onChange={e => setMove(di, mi, "note", e.target.value)}
+                    placeholder="Optional"
+                  />
+                  <button
+                    onClick={() => removeMove(di, mi)}
+                    style={{
+                      fontFamily: SANS, fontSize: "0.75rem",
+                      color: "rgba(255,80,80,0.45)",
+                      background: "none",
+                      border: "1px solid rgba(255,80,80,0.15)",
+                      width: "44px", height: "44px",
+                      cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              )
             ))}
           </div>
 
@@ -508,11 +608,13 @@ function WorkoutForm({ data, onChange }: { data: WorkoutFields; onChange: (d: Wo
             style={{
               fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
               letterSpacing: "0.18em", textTransform: "uppercase",
-              padding: "0.5rem 0.75rem",
+              padding: isMobile ? "0.75rem" : "0.5rem 0.75rem",
+              minHeight: "44px",
               border: "1px solid rgba(201,168,76,0.2)",
               color: "rgba(201,168,76,0.6)",
               background: "transparent", cursor: "pointer",
               alignSelf: "flex-start",
+              width: isMobile ? "100%" : undefined,
             }}
           >
             + Add Exercise
@@ -526,7 +628,8 @@ function WorkoutForm({ data, onChange }: { data: WorkoutFields; onChange: (d: Wo
         style={{
           fontFamily: SANS, fontSize: "0.5625rem", fontWeight: 500,
           letterSpacing: "0.18em", textTransform: "uppercase",
-          padding: "0.625rem",
+          padding: isMobile ? "0.875rem" : "0.625rem",
+          minHeight: "44px",
           border: "1px solid rgba(201,168,76,0.25)",
           color: GOLD, background: "transparent", cursor: "pointer",
         }}
@@ -539,14 +642,18 @@ function WorkoutForm({ data, onChange }: { data: WorkoutFields; onChange: (d: Wo
 
 // ─── Tab: Check-Ins ───────────────────────────────────────────────────────────
 
-function CheckinForm({ data, onChange }: { data: CheckinFields; onChange: (d: CheckinFields) => void }) {
+function CheckinForm({ data, onChange, isMobile }: {
+  data: CheckinFields;
+  onChange: (d: CheckinFields) => void;
+  isMobile?: boolean;
+}) {
   const set = (key: keyof CheckinFields) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       onChange({ ...data, [key]: e.target.value });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "1rem" }}>
         <Field label="Check-In Date">
           <input style={inputSt} type="date" value={data.checkin_date} onChange={set("checkin_date")} />
         </Field>
@@ -579,11 +686,13 @@ function SupplementsForm({
   onChange,
   onAdd,
   onRemove,
+  isMobile,
 }: {
   rows: SupplementRow[];
   onChange: (idx: number, row: SupplementRow) => void;
   onAdd: () => void;
   onRemove: (idx: number) => void;
+  isMobile?: boolean;
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
@@ -602,7 +711,7 @@ function SupplementsForm({
           style={{
             background: "#0d0d0d",
             border: "1px solid #1c1c1c",
-            padding: "1rem",
+            padding: isMobile ? "0.875rem" : "1rem",
             display: "flex",
             flexDirection: "column",
             gap: "0.75rem",
@@ -621,26 +730,31 @@ function SupplementsForm({
               style={{
                 fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
                 letterSpacing: "0.15em", textTransform: "uppercase",
-                color: "rgba(255,80,80,0.5)",
+                color: "rgba(255,80,80,0.6)",
                 background: "none",
                 border: "1px solid rgba(255,80,80,0.2)",
-                padding: "0.25rem 0.625rem",
+                padding: isMobile ? "0.5rem 0.875rem" : "0.25rem 0.625rem",
+                minHeight: isMobile ? "44px" : undefined,
                 cursor: "pointer",
               }}
             >
               Remove
             </button>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 0.6fr", gap: "0.75rem", alignItems: "end" }}>
-            <Field label="Name">
-              <input
-                style={inputSt}
-                type="text"
-                value={row.name}
-                onChange={e => onChange(i, { ...row, name: e.target.value })}
-                placeholder="Supplement name"
-              />
-            </Field>
+
+          {/* Name full-width on mobile */}
+          <Field label="Name">
+            <input
+              style={inputSt}
+              type="text"
+              value={row.name}
+              onChange={e => onChange(i, { ...row, name: e.target.value })}
+              placeholder="Supplement name"
+            />
+          </Field>
+
+          {/* Dose / Timing / Order — 3-col on mobile, 3-col on desktop */}
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr 0.7fr" : "1fr 1fr 0.7fr", gap: "0.75rem", alignItems: "end" }}>
             <Field label="Dose">
               <input
                 style={inputSt}
@@ -669,12 +783,13 @@ function SupplementsForm({
               />
             </Field>
           </div>
-          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
+
+          <label style={{ display: "flex", alignItems: "center", gap: "0.625rem", cursor: "pointer", minHeight: "44px" }}>
             <input
               type="checkbox"
               checked={row.active}
               onChange={e => onChange(i, { ...row, active: e.target.checked })}
-              style={{ accentColor: GOLD, width: "14px", height: "14px" }}
+              style={{ accentColor: GOLD, width: "18px", height: "18px", flexShrink: 0 }}
             />
             <span style={{
               fontFamily: SANS, fontSize: "0.6875rem", fontWeight: 300,
@@ -690,7 +805,8 @@ function SupplementsForm({
         style={{
           fontFamily: SANS, fontSize: "0.5625rem", fontWeight: 500,
           letterSpacing: "0.18em", textTransform: "uppercase",
-          padding: "0.625rem",
+          padding: isMobile ? "0.875rem" : "0.625rem",
+          minHeight: "44px",
           border: "1px solid rgba(201,168,76,0.25)",
           color: GOLD, background: "transparent", cursor: "pointer",
           transition: "all 0.2s ease",
@@ -728,28 +844,39 @@ const TAB_LABELS: Record<Tab, string> = {
 export default function AdminPage() {
   const router = useRouter();
 
+  // ── Responsive ────────────────────────────────────────────────────────────
+  const [isMobile, setIsMobile] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   // ── Auth ──────────────────────────────────────────────────────────────────
-  const [checking, setChecking]   = useState(true);
-  const [token, setToken]         = useState("");
+  const [checking, setChecking]     = useState(true);
+  const [token, setToken]           = useState("");
   const [signOutHov, setSignOutHov] = useState(false);
 
   // ── Clients sidebar ───────────────────────────────────────────────────────
-  const [profiles, setProfiles]         = useState<Profile[]>([]);
+  const [profiles, setProfiles]               = useState<Profile[]>([]);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
-  const [selectedId, setSelectedId]     = useState<string | null>(null);
+  const [selectedId, setSelectedId]           = useState<string | null>(null);
 
   // ── Active tab + loading ──────────────────────────────────────────────────
-  const [activeTab, setActiveTab]   = useState<Tab>("whoop_data");
+  const [activeTab, setActiveTab]     = useState<Tab>("whoop_data");
   const [loadingData, setLoadingData] = useState(false);
 
   // ── Tab form states ───────────────────────────────────────────────────────
-  const [profile,     setProfile]     = useState<ProfileFields>(defaultProfile);
-  const [whoop,       setWhoop]       = useState<WhoopFields>(defaultWhoop);
-  const [dexa,        setDexa]        = useState<DexaFields>(defaultDexa);
-  const [nutrition,   setNutrition]   = useState<NutritionFields>(defaultNutrition);
-  const [workout,     setWorkout]     = useState<WorkoutFields>(defaultWorkout);
-  const [checkin,     setCheckin]     = useState<CheckinFields>(defaultCheckin);
-  const [supplements, setSupplements] = useState<SupplementRow[]>([]);
+  const [profile,      setProfile]      = useState<ProfileFields>(defaultProfile);
+  const [whoop,        setWhoop]        = useState<WhoopFields>(defaultWhoop);
+  const [dexa,         setDexa]         = useState<DexaFields>(defaultDexa);
+  const [nutrition,    setNutrition]    = useState<NutritionFields>(defaultNutrition);
+  const [workout,      setWorkout]      = useState<WorkoutFields>(defaultWorkout);
+  const [checkin,      setCheckin]      = useState<CheckinFields>(defaultCheckin);
+  const [supplements,  setSupplements]  = useState<SupplementRow[]>([]);
   const [deletedSupIds, setDeletedSupIds] = useState<string[]>([]);
 
   // ── Save feedback ─────────────────────────────────────────────────────────
@@ -758,11 +885,11 @@ export default function AdminPage() {
 
   // ── Add client modal ──────────────────────────────────────────────────────
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newEmail,    setNewEmail]    = useState("");
-  const [newName,     setNewName]     = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [creating,    setCreating]    = useState(false);
-  const [createError, setCreateError] = useState("");
+  const [newEmail,     setNewEmail]     = useState("");
+  const [newName,      setNewName]      = useState("");
+  const [newPassword,  setNewPassword]  = useState("");
+  const [creating,     setCreating]     = useState(false);
+  const [createError,  setCreateError]  = useState("");
 
   // ── Auth gate ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -770,8 +897,6 @@ export default function AdminPage() {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) { router.replace("/login"); return; }
 
-      // Check admin email directly from the session — no API round-trip needed.
-      // NEXT_PUBLIC_ADMIN_EMAIL must match ADMIN_EMAIL in your env.
       const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL?.toLowerCase().trim();
       const userEmail  = (session.user.email ?? "").toLowerCase().trim();
       if (!adminEmail || userEmail !== adminEmail) {
@@ -788,8 +913,6 @@ export default function AdminPage() {
       });
 
       if (!res.ok) {
-        // Profiles table may not exist yet — still show the panel so the
-        // admin can use Add New Client to get started.
         setLoadingProfiles(false);
         setChecking(false);
         return;
@@ -907,6 +1030,7 @@ export default function AdminPage() {
     setSelectedId(id);
     setActiveTab("profiles");
     setSaveMsg("");
+    setSidebarOpen(false);
     await loadClientData(id, token);
   }
 
@@ -1044,7 +1168,6 @@ export default function AdminPage() {
     } else {
       setSaveMsg("Saved.");
       await loadClientData(selectedId, token);
-      // Refresh sidebar names when profile is edited
       if (activeTab === "profiles") {
         const profilesRes = await fetch("/api/admin/profiles", {
           headers: { Authorization: `Bearer ${token}` },
@@ -1086,7 +1209,6 @@ export default function AdminPage() {
       return;
     }
 
-    // Refresh profile list
     const profilesRes = await fetch("/api/admin/profiles", {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -1099,7 +1221,6 @@ export default function AdminPage() {
     setNewPassword("");
     setCreating(false);
 
-    // Auto-select new client
     selectClient(data.user.id);
   }
 
@@ -1112,6 +1233,130 @@ export default function AdminPage() {
 
   const selectedProfile = profiles.find(p => p.id === selectedId);
 
+  // ── Sidebar content (shared between desktop and mobile drawer) ────────────
+  const sidebarContent = (
+    <>
+      {/* Mobile drawer header */}
+      {isMobile && (
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          padding: "1rem 1.25rem",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+        }}>
+          <span style={{
+            fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
+            letterSpacing: "0.22em", textTransform: "uppercase",
+            color: "rgba(201,168,76,0.6)",
+          }}>
+            Clients
+          </span>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            style={{
+              fontFamily: SANS, fontSize: "1.125rem",
+              color: "rgba(245,240,232,0.4)",
+              background: "none", border: "none",
+              cursor: "pointer",
+              minWidth: "44px", minHeight: "44px",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Desktop sidebar label */}
+      {!isMobile && (
+        <div style={{
+          padding: "1.25rem 1.25rem 1rem",
+          borderBottom: "1px solid rgba(255,255,255,0.04)",
+        }}>
+          <p style={{
+            fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
+            letterSpacing: "0.22em", textTransform: "uppercase",
+            color: "rgba(201,168,76,0.5)", margin: 0,
+          }}>
+            Clients
+          </p>
+        </div>
+      )}
+
+      {/* Client list */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "0.5rem 0" }}>
+        {loadingProfiles ? (
+          <p style={{
+            fontFamily: SANS, fontSize: "0.75rem",
+            color: "rgba(245,240,232,0.2)",
+            padding: "1rem 1.25rem", margin: 0,
+          }}>
+            Loading…
+          </p>
+        ) : profiles.length === 0 ? (
+          <p style={{
+            fontFamily: SANS, fontSize: "0.75rem", fontStyle: "italic",
+            color: "rgba(245,240,232,0.2)",
+            padding: "1rem 1.25rem", margin: 0,
+          }}>
+            No clients yet.
+          </p>
+        ) : (
+          profiles.map(p => (
+            <button
+              key={p.id}
+              onClick={() => selectClient(p.id)}
+              style={{
+                width: "100%", textAlign: "left",
+                background: selectedId === p.id ? "rgba(201,168,76,0.07)" : "transparent",
+                border: "none",
+                borderLeft: `2px solid ${selectedId === p.id ? GOLD : "transparent"}`,
+                padding: isMobile ? "1rem 1.25rem" : "0.75rem 1.25rem",
+                minHeight: "48px",
+                cursor: "pointer", transition: "all 0.15s ease",
+              }}
+            >
+              <div style={{
+                fontFamily: SANS, fontSize: "0.8125rem", fontWeight: selectedId === p.id ? 500 : 300,
+                color: selectedId === p.id ? TEXT : "rgba(245,240,232,0.5)",
+                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+              }}>
+                {p.full_name || p.email}
+              </div>
+              {p.full_name && (
+                <div style={{
+                  fontFamily: SANS, fontSize: "0.625rem",
+                  color: "rgba(245,240,232,0.25)", marginTop: "0.125rem",
+                  overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                }}>
+                  {p.email}
+                </div>
+              )}
+            </button>
+          ))
+        )}
+      </div>
+
+      {/* Add client button */}
+      <div style={{ padding: "1rem", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+        <button
+          onClick={() => { setShowAddModal(true); setCreateError(""); setSidebarOpen(false); }}
+          style={{
+            width: "100%",
+            fontFamily: SANS, fontSize: "0.5625rem", fontWeight: 500,
+            letterSpacing: "0.18em", textTransform: "uppercase",
+            padding: isMobile ? "0.875rem" : "0.625rem",
+            minHeight: "44px",
+            border: "1px solid rgba(201,168,76,0.25)",
+            color: GOLD, background: "transparent", cursor: "pointer",
+            transition: "all 0.2s ease",
+          }}
+        >
+          + Add New Client
+        </button>
+      </div>
+    </>
+  );
+
   return (
     <div style={{ minHeight: "100vh", background: BG, display: "flex", flexDirection: "column" }}>
 
@@ -1119,182 +1364,217 @@ export default function AdminPage() {
       <nav style={{
         position: "sticky", top: 0, zIndex: 20,
         background: BG, borderBottom: "1px solid rgba(201,168,76,0.15)",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "1rem 2.5rem", flexShrink: 0,
+        flexShrink: 0,
       }}>
-        <span style={{
-          fontFamily: DISPLAY, fontSize: "1rem", fontWeight: 500,
-          letterSpacing: "0.18em", textTransform: "uppercase", color: TEXT,
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: isMobile ? "0 0.75rem" : "1rem 2.5rem",
+          height: isMobile ? "56px" : "auto",
+          minHeight: isMobile ? undefined : "57px",
         }}>
-          Aurea
-        </span>
-        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-          <span style={{
-            fontFamily: SANS, fontSize: "0.625rem", letterSpacing: "0.22em",
-            textTransform: "uppercase", color: "rgba(201,168,76,0.6)",
-          }}>
-            Admin Panel
-          </span>
-          <button
-            onClick={handleSignOut}
-            onMouseEnter={() => setSignOutHov(true)}
-            onMouseLeave={() => setSignOutHov(false)}
-            style={{
-              fontFamily: SANS, fontSize: "0.5625rem", fontWeight: 500,
-              letterSpacing: "0.22em", textTransform: "uppercase",
-              padding: "0.625rem 1.25rem",
-              border: `1px solid ${signOutHov ? GOLD : "rgba(201,168,76,0.3)"}`,
-              color: signOutHov ? BG : GOLD,
-              background: signOutHov ? GOLD : "transparent",
-              cursor: "pointer", transition: "all 0.25s ease",
-            }}
-          >
-            Sign Out
-          </button>
+          {/* Left: hamburger on mobile */}
+          {isMobile ? (
+            <button
+              onClick={() => setSidebarOpen(true)}
+              style={{
+                fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
+                letterSpacing: "0.15em", textTransform: "uppercase",
+                color: "rgba(201,168,76,0.7)",
+                background: "none",
+                border: "1px solid rgba(201,168,76,0.2)",
+                padding: "0 0.75rem",
+                minHeight: "44px", minWidth: "72px",
+                cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: "0.375rem",
+              }}
+            >
+              ☰ Clients
+            </button>
+          ) : (
+            <span style={{
+              fontFamily: DISPLAY, fontSize: "1rem", fontWeight: 500,
+              letterSpacing: "0.18em", textTransform: "uppercase", color: TEXT,
+            }}>
+              Aurea
+            </span>
+          )}
+
+          {/* Center: Aurea wordmark on mobile */}
+          {isMobile && (
+            <span style={{
+              fontFamily: DISPLAY, fontSize: "0.9rem", fontWeight: 500,
+              letterSpacing: "0.18em", textTransform: "uppercase", color: TEXT,
+              position: "absolute", left: "50%", transform: "translateX(-50%)",
+            }}>
+              Aurea
+            </span>
+          )}
+
+          {/* Right */}
+          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "0.5rem" : "1.5rem" }}>
+            {!isMobile && (
+              <span style={{
+                fontFamily: SANS, fontSize: "0.625rem", letterSpacing: "0.22em",
+                textTransform: "uppercase", color: "rgba(201,168,76,0.6)",
+              }}>
+                Admin Panel
+              </span>
+            )}
+            <button
+              onClick={handleSignOut}
+              onMouseEnter={() => setSignOutHov(true)}
+              onMouseLeave={() => setSignOutHov(false)}
+              style={{
+                fontFamily: SANS, fontSize: "0.5625rem", fontWeight: 500,
+                letterSpacing: "0.22em", textTransform: "uppercase",
+                padding: isMobile ? "0 0.75rem" : "0.625rem 1.25rem",
+                minHeight: "44px",
+                border: `1px solid ${signOutHov ? GOLD : "rgba(201,168,76,0.3)"}`,
+                color: signOutHov ? BG : GOLD,
+                background: signOutHov ? GOLD : "transparent",
+                cursor: "pointer", transition: "all 0.25s ease",
+              }}
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
+
+        {/* Mobile client context sub-header */}
+        {isMobile && selectedId && (
+          <div style={{
+            padding: "0.5rem 1rem",
+            borderTop: "1px solid rgba(255,255,255,0.04)",
+            background: "#0d0d0d",
+          }}>
+            <span style={{
+              fontFamily: SANS, fontSize: "0.75rem", fontWeight: 400,
+              color: "rgba(245,240,232,0.55)",
+            }}>
+              {selectedProfile?.full_name || selectedProfile?.email}
+            </span>
+          </div>
+        )}
       </nav>
 
       {/* ── Two-column layout ─────────────────────────────────────────────── */}
       <div style={{
         display: "flex", flex: 1,
-        height: "calc(100vh - 57px)", overflow: "hidden",
+        height: isMobile ? undefined : "calc(100vh - 57px)",
+        overflow: isMobile ? undefined : "hidden",
       }}>
 
-        {/* ── Sidebar ───────────────────────────────────────────────────── */}
-        <div style={{
-          width: "260px", flexShrink: 0,
-          borderRight: "1px solid rgba(255,255,255,0.05)",
-          background: "#090909",
-          display: "flex", flexDirection: "column",
-          overflow: "hidden",
-        }}>
-          {/* Sidebar label */}
+        {/* ── Desktop Sidebar ────────────────────────────────────────────── */}
+        {!isMobile && (
           <div style={{
-            padding: "1.25rem 1.25rem 1rem",
-            borderBottom: "1px solid rgba(255,255,255,0.04)",
+            width: "260px", flexShrink: 0,
+            borderRight: "1px solid rgba(255,255,255,0.05)",
+            background: "#090909",
+            display: "flex", flexDirection: "column",
+            overflow: "hidden",
           }}>
-            <p style={{
-              fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
-              letterSpacing: "0.22em", textTransform: "uppercase",
-              color: "rgba(201,168,76,0.5)", margin: 0,
-            }}>
-              Clients
-            </p>
+            {sidebarContent}
           </div>
+        )}
 
-          {/* Client list */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "0.5rem 0" }}>
-            {loadingProfiles ? (
-              <p style={{
-                fontFamily: SANS, fontSize: "0.75rem",
-                color: "rgba(245,240,232,0.2)",
-                padding: "1rem 1.25rem", margin: 0,
-              }}>
-                Loading…
-              </p>
-            ) : profiles.length === 0 ? (
-              <p style={{
-                fontFamily: SANS, fontSize: "0.75rem", fontStyle: "italic",
-                color: "rgba(245,240,232,0.2)",
-                padding: "1rem 1.25rem", margin: 0,
-              }}>
-                No clients yet.
-              </p>
-            ) : (
-              profiles.map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => selectClient(p.id)}
-                  style={{
-                    width: "100%", textAlign: "left",
-                    background: selectedId === p.id ? "rgba(201,168,76,0.07)" : "transparent",
-                    border: "none",
-                    borderLeft: `2px solid ${selectedId === p.id ? GOLD : "transparent"}`,
-                    padding: "0.75rem 1.25rem",
-                    cursor: "pointer", transition: "all 0.15s ease",
-                  }}
-                >
-                  <div style={{
-                    fontFamily: SANS, fontSize: "0.8125rem", fontWeight: selectedId === p.id ? 500 : 300,
-                    color: selectedId === p.id ? TEXT : "rgba(245,240,232,0.5)",
-                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                  }}>
-                    {p.full_name || p.email}
-                  </div>
-                  {p.full_name && (
-                    <div style={{
-                      fontFamily: SANS, fontSize: "0.625rem",
-                      color: "rgba(245,240,232,0.25)", marginTop: "0.125rem",
-                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                    }}>
-                      {p.email}
-                    </div>
-                  )}
-                </button>
-              ))
-            )}
-          </div>
-
-          {/* Add client button */}
-          <div style={{ padding: "1rem", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-            <button
-              onClick={() => { setShowAddModal(true); setCreateError(""); }}
+        {/* ── Mobile Sidebar Drawer ──────────────────────────────────────── */}
+        {isMobile && sidebarOpen && (
+          <>
+            {/* Backdrop */}
+            <div
+              onClick={() => setSidebarOpen(false)}
               style={{
-                width: "100%",
-                fontFamily: SANS, fontSize: "0.5625rem", fontWeight: 500,
-                letterSpacing: "0.18em", textTransform: "uppercase",
-                padding: "0.625rem",
-                border: "1px solid rgba(201,168,76,0.25)",
-                color: GOLD, background: "transparent", cursor: "pointer",
-                transition: "all 0.2s ease",
+                position: "fixed", inset: 0, zIndex: 30,
+                background: "rgba(0,0,0,0.65)",
               }}
-            >
-              + Add New Client
-            </button>
-          </div>
-        </div>
+            />
+            {/* Drawer */}
+            <div style={{
+              position: "fixed", top: 0, left: 0, bottom: 0, zIndex: 31,
+              width: "min(85vw, 320px)",
+              background: "#090909",
+              display: "flex", flexDirection: "column",
+              overflow: "hidden",
+              boxShadow: "4px 0 24px rgba(0,0,0,0.6)",
+            }}>
+              {sidebarContent}
+            </div>
+          </>
+        )}
 
         {/* ── Main panel ────────────────────────────────────────────────── */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "2rem 2.5rem" }}>
+        <div style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: isMobile ? "1.25rem 1rem 6rem" : "2rem 2.5rem",
+          scrollPaddingBottom: "6rem",
+        }}>
           {!selectedId ? (
             <div style={{
               display: "flex", alignItems: "center", justifyContent: "center",
-              height: "100%",
+              height: isMobile ? "50vh" : "100%",
             }}>
               <p style={{
                 fontFamily: SANS, fontSize: "0.8125rem", fontWeight: 300,
                 color: "rgba(245,240,232,0.2)", fontStyle: "italic",
+                textAlign: "center",
               }}>
-                Select a client to view and edit their data.
+                {isMobile ? "Tap ☰ Clients to select a client." : "Select a client to view and edit their data."}
               </p>
             </div>
           ) : (
             <div>
-              {/* Client name header */}
-              <div style={{ marginBottom: "1.75rem" }}>
-                <h1 style={{
-                  fontFamily: DISPLAY, fontSize: "1.75rem", fontWeight: 400,
-                  color: TEXT, margin: "0 0 0.25rem", letterSpacing: "0.02em",
-                }}>
-                  {selectedProfile?.full_name || selectedProfile?.email}
-                </h1>
-                {selectedProfile?.full_name && (
-                  <p style={{
-                    fontFamily: SANS, fontSize: "0.75rem",
-                    color: "rgba(245,240,232,0.3)", margin: 0,
+              {/* Client name header — desktop only (mobile uses nav sub-header) */}
+              {!isMobile && (
+                <div style={{ marginBottom: "1.75rem" }}>
+                  <h1 style={{
+                    fontFamily: DISPLAY, fontSize: "1.75rem", fontWeight: 400,
+                    color: TEXT, margin: "0 0 0.25rem", letterSpacing: "0.02em",
                   }}>
-                    {selectedProfile.email}
-                  </p>
-                )}
-              </div>
+                    {selectedProfile?.full_name || selectedProfile?.email}
+                  </h1>
+                  {selectedProfile?.full_name && (
+                    <p style={{
+                      fontFamily: SANS, fontSize: "0.75rem",
+                      color: "rgba(245,240,232,0.3)", margin: 0,
+                    }}>
+                      {selectedProfile.email}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Mobile client heading */}
+              {isMobile && (
+                <div style={{ marginBottom: "1.25rem" }}>
+                  <h1 style={{
+                    fontFamily: DISPLAY, fontSize: "1.375rem", fontWeight: 400,
+                    color: TEXT, margin: "0 0 0.125rem", letterSpacing: "0.02em",
+                  }}>
+                    {selectedProfile?.full_name || selectedProfile?.email}
+                  </h1>
+                  {selectedProfile?.full_name && (
+                    <p style={{
+                      fontFamily: SANS, fontSize: "0.6875rem",
+                      color: "rgba(245,240,232,0.3)", margin: 0,
+                    }}>
+                      {selectedProfile.email}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Tab bar */}
               <div style={{
                 display: "flex",
                 borderBottom: "1px solid rgba(255,255,255,0.05)",
-                marginBottom: "1.75rem",
+                marginBottom: isMobile ? "1.25rem" : "1.75rem",
                 overflowX: "auto",
-              }}>
+                // Hide scrollbar cross-browser
+                msOverflowStyle: "none",
+                scrollbarWidth: "none",
+                WebkitOverflowScrolling: "touch",
+              } as React.CSSProperties}>
                 {TABS.map(tab => (
                   <button
                     key={tab}
@@ -1302,13 +1582,15 @@ export default function AdminPage() {
                     style={{
                       fontFamily: SANS, fontSize: "0.5625rem", fontWeight: 500,
                       letterSpacing: "0.18em", textTransform: "uppercase",
-                      padding: "0.625rem 1.125rem",
+                      padding: isMobile ? "0.875rem 0.875rem" : "0.625rem 1.125rem",
+                      minHeight: "44px",
                       border: "none",
                       borderBottom: `2px solid ${activeTab === tab ? GOLD : "transparent"}`,
                       color: activeTab === tab ? GOLD : "rgba(245,240,232,0.3)",
                       background: "transparent", cursor: "pointer",
                       transition: "all 0.2s ease", whiteSpace: "nowrap",
                       marginBottom: "-1px",
+                      flexShrink: 0,
                     }}
                   >
                     {TAB_LABELS[tab]}
@@ -1321,20 +1603,21 @@ export default function AdminPage() {
                 background: "#111111",
                 border: "1px solid rgba(255,255,255,0.06)",
                 borderRadius: "0.75rem",
-                padding: "1.75rem",
+                padding: isMobile ? "1rem" : "1.75rem",
                 opacity: loadingData ? 0.45 : 1,
                 transition: "opacity 0.2s ease",
                 pointerEvents: loadingData ? "none" : "auto",
               }}>
-                {activeTab === "profiles"          && <ProfileForm data={profile} onChange={setProfile} />}
-                {activeTab === "whoop_data"      && <WhoopForm data={whoop} onChange={setWhoop} />}
-                {activeTab === "dexa_scans"       && <DexaForm data={dexa} onChange={setDexa} />}
-                {activeTab === "nutrition_plans"  && <NutritionForm data={nutrition} onChange={setNutrition} />}
-                {activeTab === "workout_plans"    && <WorkoutForm data={workout} onChange={setWorkout} />}
-                {activeTab === "checkins"         && <CheckinForm data={checkin} onChange={setCheckin} />}
+                {activeTab === "profiles"         && <ProfileForm    data={profile}    onChange={setProfile}    isMobile={isMobile} />}
+                {activeTab === "whoop_data"        && <WhoopForm      data={whoop}      onChange={setWhoop}      isMobile={isMobile} />}
+                {activeTab === "dexa_scans"        && <DexaForm       data={dexa}       onChange={setDexa}       isMobile={isMobile} />}
+                {activeTab === "nutrition_plans"   && <NutritionForm  data={nutrition}  onChange={setNutrition}  isMobile={isMobile} />}
+                {activeTab === "workout_plans"     && <WorkoutForm    data={workout}    onChange={setWorkout}    isMobile={isMobile} />}
+                {activeTab === "checkins"          && <CheckinForm    data={checkin}    onChange={setCheckin}    isMobile={isMobile} />}
                 {activeTab === "supplements" && (
                   <SupplementsForm
                     rows={supplements}
+                    isMobile={isMobile}
                     onChange={(idx, row) =>
                       setSupplements(prev => prev.map((r, i) => i === idx ? row : r))
                     }
@@ -1353,18 +1636,28 @@ export default function AdminPage() {
                 )}
               </div>
 
-              {/* Save footer */}
-              <div style={{
-                display: "flex", alignItems: "center", gap: "1rem",
-                marginTop: "1.25rem",
-              }}>
+              {/* Save footer — sticky on mobile, inline on desktop */}
+              <div style={
+                isMobile ? {
+                  position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 10,
+                  background: BG,
+                  borderTop: "1px solid rgba(255,255,255,0.06)",
+                  padding: "0.875rem 1rem",
+                  display: "flex", alignItems: "center", gap: "1rem",
+                } : {
+                  display: "flex", alignItems: "center", gap: "1rem",
+                  marginTop: "1.25rem",
+                }
+              }>
                 <button
                   onClick={handleSave}
                   disabled={saving || loadingData}
                   style={{
                     fontFamily: SANS, fontSize: "0.5625rem", fontWeight: 500,
                     letterSpacing: "0.22em", textTransform: "uppercase",
-                    padding: "0.75rem 2.25rem",
+                    padding: isMobile ? "0 1.5rem" : "0.75rem 2.25rem",
+                    minHeight: "44px",
+                    flex: isMobile ? 1 : undefined,
                     border: `1px solid ${saving ? "rgba(201,168,76,0.2)" : GOLD}`,
                     color: saving ? "rgba(201,168,76,0.4)" : BG,
                     background: saving ? "transparent" : GOLD,
@@ -1395,32 +1688,56 @@ export default function AdminPage() {
           style={{
             position: "fixed", inset: 0, zIndex: 100,
             background: "rgba(0,0,0,0.8)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            padding: "2rem",
+            display: "flex",
+            alignItems: isMobile ? "flex-end" : "center",
+            justifyContent: "center",
+            padding: isMobile ? 0 : "2rem",
           }}
           onClick={e => { if (e.target === e.currentTarget) setShowAddModal(false); }}
         >
           <div style={{
-            width: "100%", maxWidth: "420px",
+            width: "100%",
+            maxWidth: isMobile ? "100%" : "420px",
             background: "#0d0d0d",
             border: "1px solid rgba(201,168,76,0.25)",
-            padding: "2.5rem",
+            borderRadius: isMobile ? "1rem 1rem 0 0" : undefined,
+            borderBottom: isMobile ? "none" : undefined,
+            padding: isMobile ? "1.75rem 1.25rem 2rem" : "2.5rem",
             display: "flex", flexDirection: "column", gap: "1.5rem",
+            maxHeight: isMobile ? "90dvh" : undefined,
+            overflowY: isMobile ? "auto" : undefined,
           }}>
-            <div>
-              <p style={{
-                fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
-                letterSpacing: "0.22em", textTransform: "uppercase",
-                color: "rgba(201,168,76,0.5)", margin: "0 0 0.5rem",
-              }}>
-                New Client
-              </p>
-              <p style={{
-                fontFamily: DISPLAY, fontSize: "1.5rem", fontWeight: 400,
-                color: TEXT, margin: 0, letterSpacing: "0.02em",
-              }}>
-                Add Client
-              </p>
+            {/* Modal header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div>
+                <p style={{
+                  fontFamily: SANS, fontSize: "0.5rem", fontWeight: 500,
+                  letterSpacing: "0.22em", textTransform: "uppercase",
+                  color: "rgba(201,168,76,0.5)", margin: "0 0 0.5rem",
+                }}>
+                  New Client
+                </p>
+                <p style={{
+                  fontFamily: DISPLAY, fontSize: "1.5rem", fontWeight: 400,
+                  color: TEXT, margin: 0, letterSpacing: "0.02em",
+                }}>
+                  Add Client
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAddModal(false)}
+                style={{
+                  fontFamily: SANS, fontSize: "1.125rem",
+                  color: "rgba(245,240,232,0.35)",
+                  background: "none", border: "none",
+                  cursor: "pointer",
+                  minWidth: "44px", minHeight: "44px",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  marginTop: "-0.5rem", marginRight: "-0.5rem",
+                }}
+              >
+                ✕
+              </button>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -1468,6 +1785,7 @@ export default function AdminPage() {
                   fontFamily: SANS, fontSize: "0.5625rem", fontWeight: 500,
                   letterSpacing: "0.22em", textTransform: "uppercase",
                   padding: "0.875rem",
+                  minHeight: "44px",
                   border: `1px solid ${creating ? "rgba(201,168,76,0.2)" : GOLD}`,
                   color: creating ? "rgba(201,168,76,0.4)" : BG,
                   background: creating ? "transparent" : GOLD,
@@ -1485,6 +1803,7 @@ export default function AdminPage() {
                   fontFamily: SANS, fontSize: "0.5625rem", fontWeight: 500,
                   letterSpacing: "0.22em", textTransform: "uppercase",
                   padding: "0.875rem",
+                  minHeight: "44px",
                   border: "1px solid rgba(255,255,255,0.1)",
                   color: "rgba(245,240,232,0.4)",
                   background: "transparent", cursor: "pointer",
