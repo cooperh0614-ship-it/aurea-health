@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -24,10 +25,19 @@ export const metadata: Metadata = {
   title: "Aurea Health: Concierge Health Optimization for High Performers",
   description:
     "Premium concierge health optimization for executives and high-performers. Blood work interpretation, supplement planning, nutrition protocol, and workout programming, all handled for you.",
+  manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
-    apple: "/apple-icon.png",
+    apple: "/icon-192.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Aurea",
+  },
+  other: {
+    "theme-color": "#0a0a0a",
   },
   openGraph: {
     title: "Aurea Health",
@@ -47,7 +57,10 @@ export default function RootLayout({
       lang="en"
       className={`${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#0a0a0a] text-[#f0ebe0]">{children}</body>
+      <body className="min-h-full bg-[#0a0a0a] text-[#f0ebe0]">
+        <ErrorBoundary>{children}</ErrorBoundary>
+        <div aria-hidden="true" className="grain-overlay" />
+      </body>
     </html>
   );
 }

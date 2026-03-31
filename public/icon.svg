@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#0a0a0a"/>
+
+  <!-- Elegant geometric "A" mark with serifs -->
+  <!-- Left leg -->
+  <polygon points="100,18 84,26 56,174 72,174 96,60" fill="#c9a84c"/>
+  <!-- Right leg -->
+  <polygon points="100,18 116,26 144,174 128,174 104,60" fill="#c9a84c"/>
+  <!-- Crossbar -->
+  <rect x="70" y="108" width="60" height="10" fill="#c9a84c"/>
+  <!-- Apex cap (thin serif triangle) -->
+  <polygon points="93,26 100,18 107,26 104,34 96,34" fill="#c9a84c"/>
+  <!-- Left base serif -->
+  <rect x="48" y="174" width="32" height="8" rx="1" fill="#c9a84c"/>
+  <!-- Right base serif -->
+  <rect x="120" y="174" width="32" height="8" rx="1" fill="#c9a84c"/>
+</svg>

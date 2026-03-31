@@ -523,10 +523,13 @@ function Hero() {
     <section
       style={{
         position: "relative",
+        top: 0,
+        margin: 0,
         minHeight: "100svh",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
+        paddingTop: "max(env(safe-area-inset-top), 0px)",
       }}
     >
       {/* Ambient glow — right side */}
@@ -1558,7 +1561,7 @@ export default function Home() {
         throw new Error(b.error || "Something went wrong.");
       }
       setFormState("success");
-      formRef.current?.reset();
+      if (formRef.current) formRef.current.reset();
     } catch (err) {
       setFormState("error");
       setErrorMsg(err instanceof Error ? err.message : "Something went wrong. Try again.");

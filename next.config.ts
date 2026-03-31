@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const withPWA = require("@ducanh2912/next-pwa").default({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === "development",
+});
+
 const nextConfig: NextConfig = {
+  // Suppress Turbopack warning caused by next-pwa's webpack plugin (PWA disabled in dev anyway)
+  turbopack: {},
   // Strict mode for catching issues early
   reactStrictMode: true,
   // Compress responses
@@ -21,4 +31,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);

@@ -199,11 +199,14 @@ function Hero() {
     <section
       style={{
         position: "relative",
+        top: 0,
+        margin: 0,
         minHeight: "100svh",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-end",
+        paddingTop: "max(env(safe-area-inset-top), 0px)",
       }}
     >
       {/* Ambient glow */}
