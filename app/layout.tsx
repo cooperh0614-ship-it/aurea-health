@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import ErrorBoundary from "./components/ErrorBoundary";
+import AuthRefresher from "./components/AuthRefresher";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -58,6 +59,7 @@ export default function RootLayout({
       className={`${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-[#0a0a0a] text-[#f0ebe0]">
+        <AuthRefresher />
         <ErrorBoundary>{children}</ErrorBoundary>
         <div aria-hidden="true" className="grain-overlay" />
       </body>
