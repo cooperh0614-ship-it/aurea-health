@@ -109,18 +109,23 @@ const SERVICES = [
 const STEPS = [
   {
     n: "01",
-    title: "Onboard",
-    body: "A focused intake covering your history, goals, and existing data. If you don't have recent labs, we'll tell you exactly what to order and where.",
+    title: "The Blood Panel",
+    body: "A comprehensive biological audit. Hormones, inflammation markers, metabolic function, micronutrient status, cardiovascular risk. The foundation of everything we build.",
   },
   {
     n: "02",
-    title: "Analyze & Build",
-    body: "We review everything and construct your complete protocol. Delivered within five business days. No template. No shortcuts.",
+    title: "The Whoop",
+    body: "24/7 data capture from day one. HRV, sleep architecture, recovery scores, strain. A live window into how the body is responding in real time.",
   },
   {
     n: "03",
-    title: "Ongoing Review",
-    body: "Monthly check-ins, quarterly lab reviews, direct advisor access. Your protocol gets adjusted as your numbers do.",
+    title: "The Protocol",
+    body: "Based on your blood results and Whoop data, we build a supplement stack, a nutrition plan, and a training protocol. Nothing generic. Everything designed around your exact biology.",
+  },
+  {
+    n: "04",
+    title: "Continuous Optimization",
+    body: "Quarterly blood panels, ongoing sleep monitoring, diet tracking, training adjustments. The protocol evolves as you do. The goal is not a quick result — it is making you feel the best you have ever felt.",
   },
 ] as const;
 
@@ -385,7 +390,7 @@ function SubmitButton({ loading }: { loading: boolean }) {
         marginTop: "0.75rem",
       }}
     >
-      {loading ? "Submitting…" : "Submit Application"}
+      {loading ? "Submitting…" : "Join the Waitlist"}
     </button>
   );
 }
@@ -395,6 +400,7 @@ function SubmitButton({ loading }: { loading: boolean }) {
 function Nav({ scrolled, onPortalOpen }: { scrolled: boolean; onPortalOpen: () => void }) {
   const [hov, setHov] = useState(false);
   const [portalHov, setPortalHov] = useState(false);
+  const [missionHov, setMissionHov] = useState(false);
   const loaded = useLoaded(300);
 
   return (
@@ -438,6 +444,26 @@ function Nav({ scrolled, onPortalOpen }: { scrolled: boolean; onPortalOpen: () =
         </span>
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          {/* Our Mission link */}
+          <a
+            href="/our-story"
+            onMouseEnter={() => setMissionHov(true)}
+            onMouseLeave={() => setMissionHov(false)}
+            style={{
+              fontFamily: T.sans,
+              fontSize: "0.5625rem",
+              fontWeight: 500,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              textDecoration: "none",
+              color: missionHov ? T.text : T.sub,
+              transition: "color 0.25s ease",
+              padding: "0.625rem 0.5rem",
+            }}
+          >
+            Our Mission
+          </a>
+
           {/* My Health Portal tile */}
           <button
             onClick={onPortalOpen}
@@ -478,7 +504,7 @@ function Nav({ scrolled, onPortalOpen }: { scrolled: boolean; onPortalOpen: () =
               transition: "all 0.25s ease",
             }}
           >
-            Apply
+            Join Waitlist
           </a>
         </div>
       </div>
@@ -491,6 +517,7 @@ function Nav({ scrolled, onPortalOpen }: { scrolled: boolean; onPortalOpen: () =
 function Hero() {
   const loaded = useLoaded(100);
   const [hov, setHov] = useState(false);
+  const [missionHov, setMissionHov] = useState(false);
 
   return (
     <section
@@ -607,7 +634,28 @@ function Hero() {
                   transition: "transform 0.22s ease, box-shadow 0.3s ease",
                 }}
               >
-                Apply for Early Access
+                Join the Waitlist
+              </a>
+            </div>
+
+            {/* Secondary mission link */}
+            <div style={{ ...rise(loaded, 820), marginBottom: "3rem" }}>
+              <a
+                href="/our-story"
+                onMouseEnter={() => setMissionHov(true)}
+                onMouseLeave={() => setMissionHov(false)}
+                style={{
+                  fontFamily: T.sans,
+                  fontSize: "0.5625rem",
+                  fontWeight: 500,
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                  textDecoration: "none",
+                  color: missionHov ? T.sub : "#3a3a3a",
+                  transition: "color 0.25s ease",
+                }}
+              >
+                Our mission &rarr;
               </a>
             </div>
 
@@ -816,7 +864,7 @@ function ServicesSection() {
     <section style={{ borderTop: `1px solid ${T.border}`, padding: "7rem 0 5rem" }}>
       <div style={CONTAINER}>
         <div ref={header.ref} style={{ ...header.style, marginBottom: "4rem" }}>
-          <Label>Services</Label>
+          <Label>What You Receive</Label>
           <h2
             style={{
               fontFamily: T.display,
@@ -827,9 +875,9 @@ function ServicesSection() {
               color: T.text,
             }}
           >
-            Four pillars.
+            The protocol,
             <br />
-            <em style={{ color: T.sub }}>One protocol.</em>
+            <em style={{ color: T.sub }}>complete.</em>
           </h2>
         </div>
         {SERVICES.map((s, i) => (
@@ -873,11 +921,12 @@ function StepCard({ step, delay }: { step: (typeof STEPS)[number]; delay: number
 
 function ProcessSection() {
   const header = useReveal(0);
+  const [linkHov, setLinkHov] = useState(false);
   return (
     <section style={{ borderTop: `1px solid ${T.border}`, background: T.bg2, padding: "7rem 0" }}>
       <div style={CONTAINER}>
         <div ref={header.ref} style={{ ...header.style, marginBottom: "5rem" }}>
-          <Label>Process</Label>
+          <Label>The Journey</Label>
           <h2
             style={{
               fontFamily: T.display,
@@ -888,15 +937,34 @@ function ProcessSection() {
               color: T.text,
             }}
           >
-            Straightforward
+            Four phases.
             <br />
-            <em style={{ color: T.sub }}>by design.</em>
+            <em style={{ color: T.sub }}>One outcome.</em>
           </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8">
           {STEPS.map((step, i) => (
             <StepCard key={step.n} step={step} delay={i * 100} />
           ))}
+        </div>
+        <div style={{ marginTop: "4rem", paddingTop: "2.5rem", borderTop: `1px solid ${T.border}` }}>
+          <a
+            href="/our-story"
+            onMouseEnter={() => setLinkHov(true)}
+            onMouseLeave={() => setLinkHov(false)}
+            style={{
+              fontFamily: T.sans,
+              fontSize: "0.5625rem",
+              fontWeight: 500,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              textDecoration: "none",
+              color: linkHov ? T.gold : "#3a3a3a",
+              transition: "color 0.25s ease",
+            }}
+          >
+            Read our mission &rarr;
+          </a>
         </div>
       </div>
     </section>
@@ -1020,7 +1088,7 @@ function ApplicationSection({
             textAlign: "center",
           }}
         >
-          <Label>Early Access</Label>
+          <Label>Waitlist</Label>
           <h2
             style={{
               fontFamily: T.display,
@@ -1032,9 +1100,9 @@ function ApplicationSection({
               marginBottom: "1.5rem",
             }}
           >
-            Apply for
+            Join the
             <br />
-            <em style={{ color: T.sub }}>membership.</em>
+            <em style={{ color: T.sub }}>waitlist.</em>
           </h2>
 
           <p
@@ -1047,18 +1115,20 @@ function ApplicationSection({
               marginBottom: "3.5rem",
             }}
           >
-            We onboard a small number of members each quarter. Every protocol
-            is built personally. We don&apos;t scale at the cost of quality.
+            Aurea Health Club is currently in development. Join the waitlist
+            now and you will receive priority access when we open for full
+            operation — along with a personal reach-out before we onboard
+            anyone else.
           </p>
 
           {formState === "success" ? (
             <div style={{ border: `1px solid ${T.border}`, padding: "4.5rem 2.5rem" }}>
               <div style={{ width: "1.75rem", height: "1px", background: T.gold, margin: "0 auto 2.25rem" }} />
               <p style={{ fontFamily: T.display, fontSize: "2rem", fontWeight: 400, color: T.text, marginBottom: "0.875rem", letterSpacing: "-0.01em" }}>
-                Application received.
+                You&apos;re on the list.
               </p>
               <p style={{ fontFamily: T.sans, fontSize: "0.875rem", fontWeight: 300, color: T.sub }}>
-                We&apos;ll review it and reach out personally if there&apos;s a fit.
+                We&apos;ll reach out personally before we open for full operation.
               </p>
             </div>
           ) : (
