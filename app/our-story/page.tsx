@@ -164,28 +164,28 @@ const PHASES = [
     n: "01",
     title: "The Blood Panel",
     subtitle: "A comprehensive biological audit.",
-    body: "Not a basic checkup. Hormones, inflammation markers, metabolic function, micronutrient status, cardiovascular risk. We read the full picture — the one that takes more than a fifteen-minute appointment to understand. This is the foundation. Every recommendation we make traces back to what we find here.",
+    body: "Not a basic checkup. Hormones, inflammation markers, metabolic function, micronutrient status, cardiovascular risk. We read the full picture. The one that takes more than a fifteen-minute appointment to understand. This is the foundation. Every recommendation we make traces back to what we find here.",
     stat: { value: "80+", label: "Markers analyzed" },
   },
   {
     n: "02",
     title: "The Whoop",
     subtitle: "24/7 data capture from day one.",
-    body: "HRV, sleep architecture, recovery scores, strain. A live window into how the body is responding in real time. Every night of sleep and every day of output becomes a data point we act on. Not eventually — continuously. The Whoop bridges the gap between what your blood tells us and what your life is actually doing to it.",
+    body: "HRV, sleep architecture, recovery scores, strain. A live window into how the body is responding in real time. Every night of sleep and every day of output becomes a data point we act on. Not eventually. Continuously. The Whoop bridges the gap between what your blood tells us and what your life is actually doing to it.",
     stat: { value: "24/7", label: "Continuous monitoring" },
   },
   {
     n: "03",
     title: "The Protocol",
     subtitle: "Nothing generic. Everything exact.",
-    body: "Based on your blood results and Whoop data, we build three things specific to you — a supplement stack, a nutrition plan, and a training protocol. Designed around your exact biology and your exact goals. This is where clients start feeling different. Not because of a generic program. Because of yours.",
+    body: "Based on your blood results and Whoop data, we build three things specific to you: a supplement stack, a nutrition plan, and a training protocol. Designed around your exact biology and your exact goals. This is where clients start feeling different. Not because of a generic program. Because of yours.",
     stat: { value: "3", label: "Pillars built for you" },
   },
   {
     n: "04",
     title: "Continuous Optimization",
     subtitle: "The protocol evolves as you do.",
-    body: "Quarterly blood panels, ongoing sleep monitoring, diet tracking, training adjustments. We do not hand you a document and disappear. We stay in the data. The goal is not a quick result — it is making you feel the best you have ever felt and keeping you there.",
+    body: "Quarterly blood panels, ongoing sleep monitoring, diet tracking, training adjustments. We do not hand you a document and disappear. We stay in the data. The goal is not a quick result. It is making you feel the best you have ever felt and keeping you there.",
     stat: { value: "4×", label: "Blood panels per year" },
   },
 ] as const;
@@ -313,7 +313,7 @@ function Hero() {
               color: T.sub,
             }}
           >
-            We take each client through a specific journey — from a
+            We take each client through a specific journey: from a
             comprehensive blood panel and continuous biometric data to a fully
             personalized protocol that evolves as your biology does. The result
             is not a better version of what you are now. It is something
@@ -682,7 +682,7 @@ function Closing() {
             }}
           >
             Aurea Health Club is currently in development. Join the waitlist
-            now and receive priority access when we open for full operation —
+            now and receive priority access when we open for full operation,
             along with a personal reach-out before we onboard anyone else.
           </p>
         </div>

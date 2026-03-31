@@ -86,23 +86,23 @@ function rise(on: boolean, delay: number): React.CSSProperties {
 const SERVICES = [
   {
     n: "01",
-    title: "Blood Work Interpretation",
-    body: "Your labs contain more information than any appointment allows time to explain. We read your full panel: hormones, metabolic markers, inflammatory indicators. Then we build a clear picture of what your biology is actually doing.",
+    title: "Full Biomarker Analysis and Research",
+    body: "A comprehensive audit of your biology. Not a standard checkup. We analyze hormones, inflammatory markers, metabolic function, micronutrient status, and cardiovascular risk. Every result is interpreted in full, with context, so you understand exactly what your body is doing and why.",
   },
   {
     n: "02",
-    title: "Supplement Protocol",
-    body: "No guessing. No generic stacks. Your protocol is built from your bloodwork, your goals, and your lifestyle. We specify what, when, and in what form. We adjust as your markers change.",
+    title: "Comprehensive Sleep and Recovery Coaching",
+    body: "Recovery is where adaptation happens. Using continuous biometric data: HRV, sleep architecture, recovery scores, and strain. We identify the patterns limiting your output and build a coaching framework around them. Better sleep. Smarter recovery. Measurable results.",
   },
   {
     n: "03",
-    title: "Nutrition Architecture",
-    body: "Not a meal plan. A framework built around your biology, your schedule, and what your output demands. Specific enough to drive real change. Adaptable enough to survive your life.",
+    title: "Detailed Supplement Education and Provided Protocol",
+    body: "Most people are guessing. We are not. Your supplement protocol is built directly from your bloodwork, addressing deficiencies, supporting your goals, and sequenced for maximum efficacy. Every recommendation comes with the reasoning behind it so you understand what you are taking and why.",
   },
   {
     n: "04",
-    title: "Training Programming",
-    body: "Your capacity for stress and recovery is measurable. We measure it, then build around it. Training that accounts for your hormonal state, your recovery status, and where you're trying to go.",
+    title: "Specifically Designed Nutrition and Training Architecture",
+    body: "Generic programs produce generic results. Your nutrition framework and training protocol are built around your exact biology, recovery capacity, and performance goals. As your data evolves, so does the plan, continuously refined to keep driving progress.",
   },
 ] as const;
 
@@ -125,7 +125,7 @@ const STEPS = [
   {
     n: "04",
     title: "Continuous Optimization",
-    body: "Quarterly blood panels, ongoing sleep monitoring, diet tracking, training adjustments. The protocol evolves as you do. The goal is not a quick result — it is making you feel the best you have ever felt.",
+    body: "Quarterly blood panels, ongoing sleep monitoring, diet tracking, training adjustments. The protocol evolves as you do. The goal is not a quick result. It is making you feel the best you have ever felt.",
   },
 ] as const;
 
@@ -802,54 +802,149 @@ function ServiceRow({
   return (
     <div
       ref={a.ref}
-      style={a.style}
+      style={{
+        ...a.style,
+        position: "relative",
+      }}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
     >
-      <div style={{ borderTop: `1px solid ${T.border}`, padding: "2.75rem 0" }}>
-        {/* Desktop 3-col */}
-        <div className="hidden md:grid md:grid-cols-[3.5rem_22rem_1fr] md:gap-x-10 md:items-start">
-          <span
+      {/* Gold left border — slides in on hover */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: "2px",
+          background: T.gold,
+          opacity: hov ? 0.7 : 0,
+          transform: hov ? "scaleY(1)" : "scaleY(0.3)",
+          transformOrigin: "top",
+          transition: "opacity 0.4s ease, transform 0.4s cubic-bezier(0.16,1,0.3,1)",
+        }}
+      />
+
+      {/* Hover background wash */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(90deg, rgba(201,168,76,0.03) 0%, transparent 60%)",
+          opacity: hov ? 1 : 0,
+          transition: "opacity 0.5s ease",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        style={{
+          borderTop: `1px solid ${hov ? "rgba(201,168,76,0.18)" : T.border}`,
+          padding: "3.25rem 0 3.25rem 2rem",
+          position: "relative",
+          transition: "border-color 0.4s ease",
+        }}
+      >
+        {/* Desktop layout */}
+        <div className="hidden md:grid md:grid-cols-[4rem_1fr_1.6fr] md:gap-x-12 md:items-start">
+
+          {/* Number — large decorative */}
+          <div style={{ paddingTop: "0.25rem" }}>
+            <span
+              style={{
+                fontFamily: T.display,
+                fontSize: "3.5rem",
+                fontWeight: 200,
+                lineHeight: 1,
+                letterSpacing: "-0.04em",
+                color: hov ? "rgba(201,168,76,0.35)" : "#1e1e1e",
+                transition: "color 0.4s ease",
+                display: "block",
+                userSelect: "none",
+              }}
+            >
+              {service.n}
+            </span>
+          </div>
+
+          {/* Title block */}
+          <div style={{ paddingRight: "2rem" }}>
+            <h3
+              style={{
+                fontFamily: T.display,
+                fontSize: "clamp(1.625rem, 2.2vw, 2.125rem)",
+                fontWeight: 400,
+                lineHeight: 1.1,
+                color: hov ? T.text : "rgba(240,235,224,0.82)",
+                letterSpacing: "-0.02em",
+                transition: "color 0.35s ease",
+                marginBottom: "1rem",
+              }}
+            >
+              {service.title}
+            </h3>
+            {/* Gold underline accent */}
+            <div
+              style={{
+                height: "1px",
+                background: T.gold,
+                width: hov ? "2.5rem" : "0.75rem",
+                opacity: hov ? 0.6 : 0.2,
+                transition: "width 0.5s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease",
+              }}
+            />
+          </div>
+
+          {/* Body */}
+          <p
             style={{
               fontFamily: T.sans,
-              fontSize: "0.5625rem",
-              fontWeight: 500,
-              letterSpacing: "0.2em",
-              color: hov ? T.gold : "#282828",
-              paddingTop: "0.5rem",
-              transition: "color 0.4s ease",
+              fontSize: "0.9375rem",
+              fontWeight: 300,
+              lineHeight: 1.9,
+              color: hov ? "#6e6e6e" : T.sub,
+              transition: "color 0.35s ease",
             }}
           >
-            {service.n}
-          </span>
-          <h3
-            style={{
-              fontFamily: T.display,
-              fontSize: "clamp(1.5rem, 2vw, 1.875rem)",
-              fontWeight: 400,
-              lineHeight: 1.15,
-              color: T.text,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            {service.title}
-          </h3>
-          <p style={{ fontFamily: T.sans, fontSize: "0.9rem", fontWeight: 300, lineHeight: 1.85, color: T.sub }}>
             {service.body}
           </p>
         </div>
 
-        {/* Mobile stacked */}
+        {/* Mobile layout */}
         <div className="md:hidden">
-          <div style={{ display: "flex", alignItems: "baseline", gap: "1rem", marginBottom: "1rem" }}>
-            <span style={{ fontFamily: T.sans, fontSize: "0.5625rem", fontWeight: 500, letterSpacing: "0.2em", color: "#282828", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "1.25rem", marginBottom: "1.25rem" }}>
+            <span
+              style={{
+                fontFamily: T.display,
+                fontSize: "2.5rem",
+                fontWeight: 200,
+                lineHeight: 1,
+                letterSpacing: "-0.04em",
+                color: "#1e1e1e",
+                flexShrink: 0,
+                userSelect: "none",
+              }}
+            >
               {service.n}
             </span>
-            <h3 style={{ fontFamily: T.display, fontSize: "1.5rem", fontWeight: 400, lineHeight: 1.2, color: T.text, letterSpacing: "-0.01em" }}>
+            <h3
+              style={{
+                fontFamily: T.display,
+                fontSize: "1.625rem",
+                fontWeight: 400,
+                lineHeight: 1.15,
+                color: T.text,
+                letterSpacing: "-0.02em",
+                paddingTop: "0.5rem",
+              }}
+            >
               {service.title}
             </h3>
           </div>
-          <p style={{ fontFamily: T.sans, fontSize: "0.9rem", fontWeight: 300, lineHeight: 1.85, color: T.sub }}>
+          <div style={{ width: "1.5rem", height: "1px", background: T.gold, opacity: 0.3, marginBottom: "1.25rem" }} />
+          <p style={{ fontFamily: T.sans, fontSize: "0.9rem", fontWeight: 300, lineHeight: 1.9, color: T.sub }}>
             {service.body}
           </p>
         </div>
@@ -860,18 +955,45 @@ function ServiceRow({
 
 function ServicesSection() {
   const header = useReveal(0);
+  const sub = useReveal(100);
   return (
-    <section style={{ borderTop: `1px solid ${T.border}`, padding: "7rem 0 5rem" }}>
-      <div style={CONTAINER}>
-        <div ref={header.ref} style={{ ...header.style, marginBottom: "4rem" }}>
+    <section
+      style={{
+        borderTop: `1px solid ${T.border}`,
+        padding: "8rem 0 6rem",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Ambient glow */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: "50vw",
+          height: "100%",
+          background: "radial-gradient(ellipse at top right, rgba(201,168,76,0.03) 0%, transparent 60%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div style={{ ...CONTAINER, position: "relative", zIndex: 1 }}>
+
+        {/* Header */}
+        <div
+          ref={header.ref}
+          style={{ ...header.style, marginBottom: "1.5rem" }}
+        >
           <Label>What You Receive</Label>
           <h2
             style={{
               fontFamily: T.display,
-              fontSize: "clamp(2.75rem, 6vw, 5rem)",
+              fontSize: "clamp(2.75rem, 6vw, 5.5rem)",
               fontWeight: 300,
-              lineHeight: 0.95,
-              letterSpacing: "-0.025em",
+              lineHeight: 0.93,
+              letterSpacing: "-0.03em",
               color: T.text,
             }}
           >
@@ -880,8 +1002,26 @@ function ServicesSection() {
             <em style={{ color: T.sub }}>complete.</em>
           </h2>
         </div>
+
+        {/* Subheading */}
+        <div ref={sub.ref} style={{ ...sub.style, marginBottom: "5rem", maxWidth: "500px" }}>
+          <p
+            style={{
+              fontFamily: T.sans,
+              fontSize: "0.9375rem",
+              fontWeight: 300,
+              lineHeight: 1.8,
+              color: "#3a3a3a",
+            }}
+          >
+            Every membership includes the following, built around your data,
+            not a template.
+          </p>
+        </div>
+
+        {/* Rows */}
         {SERVICES.map((s, i) => (
-          <ServiceRow key={s.n} service={s} delay={i * 70} />
+          <ServiceRow key={s.n} service={s} delay={i * 80} />
         ))}
         <div style={{ borderTop: `1px solid ${T.border}` }} />
       </div>
@@ -1117,7 +1257,7 @@ function ApplicationSection({
           >
             Aurea Health Club is currently in development. Join the waitlist
             now and you will receive priority access when we open for full
-            operation — along with a personal reach-out before we onboard
+            operation, along with a personal reach-out before we onboard
             anyone else.
           </p>
 
@@ -1336,7 +1476,7 @@ function HealthPortalPanel({ open, onClose }: { open: boolean; onClose: () => vo
                 margin: 0,
               }}
             >
-              Access your protocol, biomarker history, and advisor communications — all in one place.
+              Access your protocol, biomarker history, and advisor communications. All in one place.
             </p>
           </div>
 
@@ -1382,7 +1522,7 @@ function HealthPortalPanel({ open, onClose }: { open: boolean; onClose: () => vo
               margin: 0,
             }}
           >
-            Aurea Health &mdash; Member Access
+            Aurea Health · Member Access
           </p>
         </div>
       </aside>

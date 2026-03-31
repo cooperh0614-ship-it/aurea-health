@@ -15,9 +15,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Aurea Health — Concierge Health Optimization for High Performers",
+  title: "Aurea Health: Concierge Health Optimization for High Performers",
   description:
-    "Premium concierge health optimization for executives and high-performers. Blood work interpretation, supplement planning, nutrition protocol, and workout programming — all handled for you.",
+    "Premium concierge health optimization for executives and high-performers. Blood work interpretation, supplement planning, nutrition protocol, and workout programming, all handled for you.",
   openGraph: {
     title: "Aurea Health",
     description:
